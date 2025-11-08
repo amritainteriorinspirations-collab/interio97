@@ -2,8 +2,8 @@
 
 import { useRef, useState } from "react";
 import Footer from "./Footer";
-import Header from "./Header"; 
 import Sidebar from "./Sidebar";
+import Header from "./Header";
 
 export default function ClientLayout({ categories, user, children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -1,125 +1,171 @@
 import Link from "next/link";
 import { getAllCategories } from "@/lib/fetchers/categories";
 import { getAllProducts } from "@/lib/fetchers/products";
+import { FolderOpen, Package, CheckCircle, XCircle, Plus, TrendingUp } from "lucide-react";
 
 export default async function AdminDashboard() {
   const categories = await getAllCategories();
   const products = await getAllProducts();
 
+  const inStock = products.filter((p) => p.stock > 0).length;
+  const outOfStock = products.filter((p) => p.stock === 0).length;
+  const lowStock = products.filter((p) => p.stock > 0 && p.stock < 10).length;
+
   const stats = [
     {
       title: "Total Categories",
       value: categories.length,
-      icon: "📁",
+      icon: FolderOpen,
       link: "/admin/categories",
-      color: "bg-orange-500",
+      color: "bg-blue-500",
+      textColor: "text-blue-600",
+      bgColor: "bg-blue-50",
     },
     {
       title: "Total Products",
       value: products.length,
-      icon: "📦",
+      icon: Package,
       link: "/admin/products",
-      color: "bg-blue-500",
+      color: "bg-purple-500",
+      textColor: "text-purple-600",
+      bgColor: "bg-purple-50",
     },
     {
       title: "In Stock",
-      value: products.filter((p) => p.stock > 0).length,
-      icon: "✅",
+      value: inStock,
+      icon: CheckCircle,
       link: "/admin/products",
       color: "bg-green-500",
+      textColor: "text-green-600",
+      bgColor: "bg-green-50",
     },
     {
-      title: "Out of Stock",
-      value: products.filter((p) => p.stock === 0).length,
-      icon: "❌",
+      title: "Low Stock",
+      value: lowStock,
+      icon: TrendingUp,
       link: "/admin/products",
-      color: "bg-red-500",
+      color: "bg-orange-500",
+      textColor: "text-orange-600",
+      bgColor: "bg-orange-50",
     },
   ];
 
+  const recentProducts = products.slice(0, 5);
+  const recentCategories = categories.slice(0, 5);
+
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Overview of your store</p>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-sm text-gray-600 mt-1">Welcome back! Here's what's happening with your store.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat) => (
-          <Link key={stat.title} href={stat.link}>
-            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-orange-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium">{stat.title}</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{stat.value}</p>
-                </div>
-                <div className={`${stat.color} text-white p-4 rounded-full text-2xl`}>
-                  {stat.icon}
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <Link key={stat.title} href={stat.link}>
+              <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-gray-600 font-medium">{stat.title}</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                  </div>
+                  <div className={`${stat.bgColor} p-3 rounded-lg`}>
+                    <Icon className={`w-5 h-5 ${stat.textColor}`} />
+                  </div>
                 </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Quick Actions</h2>
-          </div>
-          <div className="space-y-3">
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <h2 className="text-base font-bold text-gray-900 mb-3">Quick Actions</h2>
+          <div className="space-y-2">
             <Link
               href="/admin/categories/new"
-              className="flex items-center gap-3 p-4 border-2 border-orange-200 rounded-lg hover:bg-orange-50 transition-colors"
+              className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
             >
-              <span className="text-2xl">➕</span>
+              <div className="bg-orange-100 p-2 rounded-lg">
+                <Plus className="w-4 h-4 text-orange-600" />
+              </div>
               <div>
-                <p className="font-semibold text-gray-900">Add New Category</p>
-                <p className="text-sm text-gray-600">Create a new product category</p>
+                <p className="text-sm font-semibold text-gray-900">Add New Category</p>
+                <p className="text-xs text-gray-600">Create a product category</p>
               </div>
             </Link>
             <Link
               href="/admin/products/new"
-              className="flex items-center gap-3 p-4 border-2 border-orange-200 rounded-lg hover:bg-orange-50 transition-colors"
+              className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
             >
-              <span className="text-2xl">📦</span>
+              <div className="bg-orange-100 p-2 rounded-lg">
+                <Package className="w-4 h-4 text-orange-600" />
+              </div>
               <div>
-                <p className="font-semibold text-gray-900">Add New Product</p>
-                <p className="text-sm text-gray-600">Add a product to your inventory</p>
+                <p className="text-sm font-semibold text-gray-900">Add New Product</p>
+                <p className="text-xs text-gray-600">Add to your inventory</p>
               </div>
             </Link>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Categories</h2>
-          <div className="space-y-3">
-            {categories.slice(0, 5).map((category) => (
+        {/* Recent Activity */}
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <h2 className="text-base font-bold text-gray-900 mb-3">Recent Categories</h2>
+          <div className="space-y-2">
+            {recentCategories.map((category) => (
               <Link
                 key={category._id}
                 href={`/admin/categories/${category.slug}`}
-                className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-orange-500 transition-colors"
+                className="flex items-center justify-between p-2 border border-gray-200 rounded-lg hover:border-orange-500 transition-colors"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   {category.image ? (
                     <img
                       src={category.image}
                       alt={category.name}
-                      className="w-10 h-10 rounded object-cover"
+                      className="w-8 h-8 rounded object-cover"
                     />
                   ) : (
-                    <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
-                      📁
+                    <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
+                      <FolderOpen className="w-4 h-4 text-gray-500" />
                     </div>
                   )}
-                  <span className="font-medium text-gray-900">{category.name}</span>
+                  <span className="text-sm font-medium text-gray-900">{category.name}</span>
                 </div>
-                <span className="text-gray-400">→</span>
+                <span className="text-gray-400 text-xs">→</span>
               </Link>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Low Stock Alert */}
+      {lowStock > 0 && (
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <TrendingUp className="w-5 h-5 text-orange-600" />
+            <div>
+              <h3 className="text-sm font-bold text-orange-900">Low Stock Alert</h3>
+              <p className="text-xs text-orange-700 mt-0.5">
+                {lowStock} product(s) are running low on stock. Consider restocking soon.
+              </p>
+            </div>
+            <Link
+              href="/admin/products"
+              className="ml-auto bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+            >
+              View Products
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

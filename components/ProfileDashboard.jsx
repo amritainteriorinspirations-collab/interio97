@@ -73,13 +73,13 @@ const ProfileDashboard = ({ user }) => {
             {/* Action Buttons */}
             <div className="flex gap-4 mt-6 flex-wrap">
               {/* Edit Profile */}
-              <button
+              {/* <button
                 className="flex items-center border border-orange-400 text-orange-500 hover:bg-orange-500 hover:text-white px-4 py-2 rounded-md text-sm font-medium transition"
                 onClick={() => router.push(`/profile/${user._id}/edit`)}
               >
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Profile
-              </button>
+              </button> */}
 
               {/* Logout */}
               <button
@@ -88,15 +88,6 @@ const ProfileDashboard = ({ user }) => {
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
-              </button>
-
-              {/* Create */}
-              <button
-                className="flex items-center bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium transition"
-                onClick={() => router.push("/create-task")}
-              >
-                <Pencil className="w-4 h-4 mr-2" />
-                Create Task
               </button>
 
               {/* Dashboard Switch */}

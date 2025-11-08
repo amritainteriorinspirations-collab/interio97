@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
 
 export default function ProductCardGrid({ product, userRole }) {
   const isEnterprise = userRole === "enterprise";
@@ -24,9 +23,9 @@ export default function ProductCardGrid({ product, userRole }) {
 
   return (
     <Link href={`/product/${product.slug}`}>
-      <div className="group bg-white rounded-lg border border-gray-200 hover:border-orange-400 hover:shadow-md transition-all duration-300 overflow-hidden">
+      <div className="group bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all duration-300 overflow-hidden h-full flex flex-col">
         {/* Product Image - 3:4 aspect ratio */}
-        <div className="relative aspect-[3/4] overflow-hidden bg-gray-50">
+        <div className="relative aspect-[3/4] overflow-hidden bg-gray-50 flex-shrink-0">
           {mainImage ? (
             <>
               <img
@@ -54,68 +53,47 @@ export default function ProductCardGrid({ product, userRole }) {
           )}
         </div>
 
-        {/* Product Info */}
-        <div className="p-3 space-y-1.5">
-          {/* Brand */}
-          {product.brand && (
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-              {product.brand}
-            </p>
-          )}
-
-          {/* Product Name */}
-          <h3 className="text-sm font-semibold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2 leading-snug min-h-[2.5rem]">
-            {product.name}
-          </h3>
-
-          {/* Pricing - Strikethrough Style */}
-          <div className="flex items-center gap-2 pt-1">
-            {hasDiscount ? (
-              <>
-                <span className="text-lg font-bold text-gray-900">
-                  ₹{displayPrice?.toLocaleString('en-IN')}
-                </span>
-                <span className="text-sm text-gray-400 line-through">
-                  ₹{originalPrice?.toLocaleString('en-IN')}
-                </span>
-              </>
-            ) : (
-              <span className="text-lg font-bold text-gray-900">
-                ₹{displayPrice?.toLocaleString('en-IN')}
-              </span>
+        {/* Product Info - Fixed height sections */}
+        <div className="p-3 flex flex-col flex-grow">
+          {/* Brand - Fixed height */}
+          <div className="h-4 mb-1">
+            {product.brand && (
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide truncate">
+                {product.brand}
+              </p>
             )}
           </div>
 
-          {/* Additional Info Row */}
-          <div className="flex items-center justify-between pt-1">
-            {/* Attributes */}
-            <div className="flex flex-wrap gap-1">
-              {product.color && (
-                <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
-                  {product.color}
-                </span>
-              )}
-              {product.size && (
-                <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
-                  {product.size}
+          {/* Product Name - Fixed height with 2 lines */}
+          <h3 className="text-sm font-semibold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2 leading-snug h-10 mb-2">
+            {product.name}
+          </h3>
+
+          {/* Pricing - Pushed to bottom */}
+          <div className="mt-auto">
+            <div className="flex items-baseline gap-2">
+              {hasDiscount ? (
+                <>
+                  <span className="text-lg font-bold text-gray-900">
+                    ₹{displayPrice?.toLocaleString('en-IN')}
+                  </span>
+                  <span className="text-xs text-gray-400 line-through">
+                    ₹{originalPrice?.toLocaleString('en-IN')}
+                  </span>
+                </>
+              ) : (
+                <span className="text-lg font-bold text-gray-900">
+                  ₹{displayPrice?.toLocaleString('en-IN')}
                 </span>
               )}
             </div>
 
-            {/* Stock Badge */}
-            {product.stock > 0 && (
-              <div className="flex items-center gap-0.5 text-green-600">
-                <CheckCircle2 className="w-3 h-3" />
-                <span className="text-xs font-medium">In Stock</span>
-              </div>
+            {isEnterprise && (
+              <p className="text-xs text-orange-600 font-medium mt-1">
+                🏢 Enterprise Price
+              </p>
             )}
           </div>
-
-          {isEnterprise && (
-            <p className="text-xs text-orange-600 font-medium pt-1">
-              🏢 Enterprise Price
-            </p>
-          )}
         </div>
       </div>
     </Link>
