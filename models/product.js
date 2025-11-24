@@ -19,6 +19,7 @@ const ProductSchema = new Schema(
 
     // 🧾 Description & Brand
     description: String,
+    
     brand: String,
 
     // 🖼️ Media
