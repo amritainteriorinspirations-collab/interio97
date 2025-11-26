@@ -9,7 +9,7 @@ export async function GET(req, { params }) {
   try {
     await DbConnect();
     const { slug } = params;
-    const product = await Product.findOne({ slug }).populate("category");
+    const product = await Product.findOne({ slug }).populate("category").populate("application");
 
     if (!product)
       return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
@@ -37,6 +37,8 @@ if (product.patternVariant) {
     _id: { $ne: product._id },
   });
 }
+
+
 
 
 

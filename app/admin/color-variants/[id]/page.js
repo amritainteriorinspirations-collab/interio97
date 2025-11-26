@@ -1,3 +1,5 @@
+// app/admin/color-variants/[id]/page.js
+
 import { getColorVariantById } from "@/lib/fetchers/colorVariants";
 import ColorVariantForm from "@/components/admin/ColorVariantForm";
 

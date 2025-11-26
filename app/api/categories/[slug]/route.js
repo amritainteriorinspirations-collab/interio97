@@ -14,7 +14,7 @@ export async function GET(req, { params }) {
     if (!category)
       return NextResponse.json({ success: false, error: "Category not found" }, { status: 404 });
 
-    const products = await Product.find({ category: category._id });
+    const products = await Product.find({ category: category._id }).populate("application").populate("category"); 
     return NextResponse.json({ success: true, data: { category, products } });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

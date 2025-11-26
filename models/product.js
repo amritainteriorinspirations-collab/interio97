@@ -2,6 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import Category from "./category.js";
 import ColorVariant from "./colorVariant.js";
 import PatternVariant from "./patternVariant.js";
+import Application from "./application.js";
 /**
  * Product Schema
  * Represents each sellable item or variant.
@@ -73,12 +74,14 @@ const ProductSchema = new Schema(
     showPerSqFtPrice: { type: Boolean, default: false },
 
     // 3. Per Sq Ft Price (manual value)
-    perSqFtPrice: { type: Number, default: null },
+    perSqFtPriceRetail: { type: Number, default: null },
+    perSqFtPriceEnterprise: { type: Number, default: null },
 
     material: [String],     // array of strings
     pattern: [String],      // array of strings
     finish: [String],       // array of strings
-    application: [String],  // already array – keep same
+
+    application: [{type: Schema.Types.ObjectId, ref: "Application"}],  
 
 
     // 7. Coverage Area

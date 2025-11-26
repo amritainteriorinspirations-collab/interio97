@@ -1,3 +1,5 @@
+// app/admin/color-variants/new/page.js
+
 import ColorVariantForm from "@/components/admin/ColorVariantForm";
 
 export default function NewColorVariantPage() {

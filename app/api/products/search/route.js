@@ -1,69 +1,72 @@
+// app/api/products/search/route.js
+
 import { NextResponse } from "next/server";
 import DbConnect from "@/lib/Db/DbConnect";
 import Product from "@/models/product";
 import Category from "@/models/category";
+import Application from "@/models/application";
 
-/**
- * Search products by query
- * GET /api/products/search?q=query
- */
 export async function GET(req) {
   try {
     await DbConnect();
 
     const { searchParams } = new URL(req.url);
-    const query = await searchParams.get("q");
+    const query = searchParams.get("q");
 
     if (!query || query.trim().length < 2) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Search query must be at least 2 characters",
-        },
+        { success: false, error: "Search query must be at least 2 characters" },
         { status: 400 }
       );
     }
 
-    const searchPattern = new RegExp(query.trim(), "i");
+    const pattern = new RegExp(query.trim(), "i");
 
-    // 🔥 Step 1 — Find categories matching search
-    const matchingCategories = await Category.find(
-      { name: searchPattern },
-      { _id: 1 }
-    );
+    // 1️⃣ Match Categories
+    const categories = await Category.find({ name: pattern }, { _id: 1 });
 
-    const categoryIds = matchingCategories.map((c) => c._id);
+    // 2️⃣ Match Applications
+    const applications = await Application.find({ name: pattern }, { _id: 1 });
 
-    // Search in multiple fields
+    const categoryIds = categories.map((c) => c._id);
+    const applicationIds = applications.map((a) => a._id);
+
     const products = await Product.find({
       $or: [
-        { name: searchPattern },
-        { description: searchPattern },
-        { brand: searchPattern },
-        { sku: searchPattern },
-        { tags: searchPattern },
+        { name: pattern },
+        { description: pattern },
+        { brand: pattern },
+        { sku: pattern },
+        { tags: pattern },
 
-        // 🔥 NEW SEARCHABLE FIELDS
-        { material: searchPattern },
-        { pattern: searchPattern },
-        { finish: searchPattern },
-        { coverageArea: searchPattern },
-        { application: searchPattern }, // array match supported by Mongo
-        categoryIds.length > 0 ? { category: { $in: categoryIds } } : null,
+        { material: pattern },
+        { pattern: pattern },
+        { finish: pattern },
+        { coverageArea: pattern },
+
+        // Category search
+        categoryIds.length > 0
+          ? { category: { $in: categoryIds } }
+          : null,
+
+        // Application search
+        applicationIds.length > 0
+          ? { application: { $in: applicationIds } }
+          : null,
       ].filter(Boolean),
-    }).populate("category");
+    })
+      .populate("category")
+      .populate("application");
 
     return NextResponse.json({
       success: true,
       data: products,
       count: products.length,
     });
+
   } catch (error) {
     return NextResponse.json(
-      {
-        success: false,
-        error: error.message,
-      },
+      { success: false, error: error.message },
       { status: 500 }
     );
   }

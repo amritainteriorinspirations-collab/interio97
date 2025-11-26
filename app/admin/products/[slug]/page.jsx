@@ -5,12 +5,14 @@ import { getAllPatternVariants } from "@/lib/fetchers/patternVariants";
 import ProductForm from "@/components/admin/ProductForm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getAllApplications } from "@/lib/fetchers/applications";
 
 export default async function EditProductPage({ params }) {
   const data = await getProductBySlug(params.slug);
   const categories = await getAllCategories();
   const colorVariants = await getAllColorVariants();
   const patternVariants = await getAllPatternVariants();
+  const applications = await getAllApplications();
 
   if (!data) {
     notFound();
@@ -32,6 +34,7 @@ export default async function EditProductPage({ params }) {
         categories={categories}
         colorVariants={colorVariants}
         patternVariants={patternVariants}
+        applications={applications}
       />
 
       {variants && variants.length > 0 && (

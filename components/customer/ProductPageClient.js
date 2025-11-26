@@ -1,40 +1,82 @@
 "use client";
 
 import { useState } from "react";
-import { Share2, Phone, MessageCircle, Check, Copy, ShoppingCart } from "lucide-react";
+import {
+  Share2,
+  Phone,
+  MessageCircle,
+  Check,
+  Copy,
+  ShoppingCart,
+} from "lucide-react";
 import ProductImageGallery from "./ProductImageGallery";
 import ProductVariants from "./ProductVariants";
 
-export default function ProductPageClient({ product, variants, colorVariants, patternVariants, userRole }) {
+export default function ProductPageClient({
+  product,
+  variants,
+  colorVariants,
+  patternVariants,
+  userRole,
+}) {
   const [showCopied, setShowCopied] = useState(false);
   const [showNumberCopied, setShowNumberCopied] = useState(false);
-  
-  const isEnterprise = userRole === "enterprise";
+
   const phoneNumber = "+916299811965";
+  const isEnterprise = userRole === "enterprise";
 
- // 🔥 New logic
-let displayPrice;
-
-if (product.showPerSqFtPrice) {
-  displayPrice = product.perSqFtPrice;
-} else {
-  displayPrice = isEnterprise
-    ? (product.enterpriseDiscountPrice || product.enterprisePrice)
-    : (product.retailDiscountPrice || product.retailPrice);
-}
+    console.log(product)
 
 
-  const originalPrice = isEnterprise
-    ? product.enterprisePrice
-    : product.retailPrice;
+  // -----------------------------
+  // ✅ CLEAN PRICE LOGIC (final)
+  // -----------------------------
 
-  const hasDiscount = isEnterprise
-    ? product.enterpriseDiscountPrice && product.enterpriseDiscountPrice < product.enterprisePrice
-    : product.retailDiscountPrice && product.retailDiscountPrice < product.retailPrice;
+  // Pick enterprise or retail fields
+  const discounted = isEnterprise
+    ? product.enterpriseDiscountPrice
+    : product.retailDiscountPrice;
 
-  const discountPercentage = hasDiscount
-    ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100)
-    : 0;
+  const original = isEnterprise ? product.enterprisePrice : product.retailPrice;
+
+  const perSqFt = isEnterprise
+    ? product.perSqFtPriceEnterprise
+    : product.perSqFtPriceRetail;
+
+  // Check discount
+  const hasDiscount = discounted && discounted < original;
+
+  // Final structured values
+  let primaryPrice;
+  let secondaryPrice = null;
+
+  // CASE A — show price per SqFt
+  if (product.showPerSqFtPrice) {
+    primaryPrice = perSqFt;
+
+    secondaryPrice = {
+      discounted: discounted || original,
+      original: hasDiscount ? original : null,
+      discountPercent: hasDiscount
+        ? Math.round(((original - discounted) / original) * 100)
+        : 0,
+      savings: hasDiscount ? original - discounted : 0,
+    };
+  }
+  // CASE B — normal price
+  else {
+    primaryPrice = discounted || original;
+
+    secondaryPrice = hasDiscount
+      ? {
+          original,
+          discountPercent: Math.round(
+            ((original - discounted) / original) * 100
+          ),
+          savings: original - discounted,
+        }
+      : null;
+  }
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -59,7 +101,10 @@ if (product.showPerSqFtPrice) {
 
   const handleWhatsApp = () => {
     const message = `Hi, I'm interested in ${product.name}. Link: ${window.location.href}`;
-    const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/${phoneNumber.replace(
+      /[^0-9]/g,
+      ""
+    )}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
 
@@ -72,7 +117,10 @@ if (product.showPerSqFtPrice) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
         {/* Left: Image Gallery - Smaller */}
         <div className="max-w-md mx-auto w-full">
-          <ProductImageGallery images={product.images} productName={product.name} />
+          <ProductImageGallery
+            images={product.images}
+            productName={product.name}
+          />
         </div>
 
         {/* Right: Product Details */}
@@ -107,105 +155,123 @@ if (product.showPerSqFtPrice) {
             {product.name}
           </h1>
 
-          
-          {/* Price Section */}
+          {/* PRICE BOX */}
           <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-            <div className="flex items-center gap-2.5">
+            {/* MAIN ROW */}
+            <div className="flex items-center justify-between">
+              {/* LEFT SIDE — PRIMARY PRICE */}
+              <div>
+                {product.showPerSqFtPrice ? (
+                  <span className="text-2xl font-bold text-gray-900">
+                    ₹{primaryPrice} / SqFt
+                  </span>
+                ) : (
+                  <span className="text-2xl font-bold text-gray-900">
+                    ₹{primaryPrice} / {product.sellBy}
+                  </span>
+                )}
 
-  {product.showPerSqFtPrice ? (
-    <>
-      {/* MAIN PRICE PER SQ FT */}
-      <span className="text-2xl font-bold text-gray-900">
-        ₹{product.perSqFtPrice} / SqFt
-      </span>
+                {/* SAVINGS IF DISCOUNT EXISTS */}
+                {secondaryPrice?.savings > 0 && (
+                  <p className="text-xs text-green-600 font-medium">
+                    You save ₹{secondaryPrice.savings}
+                  </p>
+                )}
+              </div>
 
-      {/* OLD PRICE RIGHT SIDE */}
-      <span className="text-sm text-gray-400 ml-auto">
-        ₹{originalPrice} / {product.sellBy}
-      </span>
-    </>
-  ) : (
-    // OLD LOGIC
-    <>
-      {hasDiscount ? (
-        <>
-          <span className="text-2xl font-bold text-gray-900">
-            ₹{displayPrice}
-          </span>
-          <span className="text-base text-gray-400 line-through">
-            ₹{originalPrice}
-          </span>
-        </>
-      ) : (
-        <span className="text-2xl font-bold text-gray-900">
-          ₹{displayPrice}
-        </span>
-      )}
-    </>
-  )}
-</div>
+              {/* RIGHT SIDE — DISCOUNTED + ORIGINAL */}
+              <div className="text-right">
+                {/* Discounted per sellBy (only in perSqFt mode) */}
+                {product.showPerSqFtPrice && (
+                  <>
+                    <span className="text-sm text-gray-900 font-medium block">
+                      ₹{secondaryPrice.discounted} / {product.sellBy}
+                    </span>
+
+                    {/* Original if discount exists */}
+                    {secondaryPrice.original && (
+                      <span className="text-xs text-gray-400 line-through block">
+                        ₹{secondaryPrice.original} / {product.sellBy}
+                      </span>
+                    )}
+                  </>
+                )}
+
+                {/* Normal mode original price */}
+                {!product.showPerSqFtPrice && secondaryPrice?.original && (
+                  <span className="text-sm text-gray-400 line-through">
+                    ₹{secondaryPrice.original} / {product.sellBy}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* % OFF BELOW */}
+            {secondaryPrice?.discountPercent > 0 && (
+              <p className="text-xs text-green-600 font-semibold mt-1">
+                {secondaryPrice.discountPercent}% OFF
+              </p>
+            )}
 
             {isEnterprise && (
-              <p className="text-xs text-orange-600 mt-1.5 font-medium">
+              <p className="text-xs text-orange-600 mt-1 font-medium">
                 ✓ Enterprise Price Applied
               </p>
             )}
+
             <p className="text-xs text-gray-600 mt-1">Inclusive of all taxes</p>
           </div>
 
-{colorVariants?.length > 0 && (
-  <div className="mt-4">
-    <p className="text-xs font-medium text-gray-600 mb-1">Color Variants</p>
+          {colorVariants?.length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs font-medium text-gray-600 mb-1">
+                Color Variants
+              </p>
 
-    <div className="flex gap-2">
-      {colorVariants.map((c) => (
-        <a
-          key={c._id}
-          href={`/product/${c.slug}`}
-          className="w-12 h-12 border rounded overflow-hidden hover:shadow transition-all"
-        >
-          <img
-            src={c.images?.[0]}
-            alt={c.name}
-            className="w-full h-full object-cover"
-          />
-        </a>
-      ))}
-    </div>
-  </div>
-)}
+              <div className="flex gap-2">
+                {colorVariants.map((c) => (
+                  <a
+                    key={c._id}
+                    href={`/product/${c.slug}`}
+                    className="w-12 h-12 border rounded overflow-hidden hover:shadow transition-all"
+                  >
+                    <img
+                      src={c.images?.[0]}
+                      alt={c.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
 
+          {patternVariants?.length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs font-medium text-gray-600 mb-1">
+                Pattern Variants
+              </p>
 
-{patternVariants?.length > 0 && (
-  <div className="mt-4">
-    <p className="text-xs font-medium text-gray-600 mb-1">Pattern Variants</p>
-
-    <div className="flex gap-2">
-      {patternVariants.map((p) => (
-        <a
-          key={p._id}
-          href={`/product/${p.slug}`}
-          className="w-12 h-12 border rounded overflow-hidden hover:shadow transition-all"
-        >
-          <img
-            src={p.images?.[0]}
-            alt={p.name}
-            className="w-full h-full object-cover"
-          />
-        </a>
-      ))}
-    </div>
-  </div>
-)}
-
-
-
-
+              <div className="flex gap-2">
+                {patternVariants.map((p) => (
+                  <a
+                    key={p._id}
+                    href={`/product/${p.slug}`}
+                    className="w-12 h-12 border rounded overflow-hidden hover:shadow transition-all"
+                  >
+                    <img
+                      src={p.images?.[0]}
+                      alt={p.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Add to Cart Button */}
-          <button
-            className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors text-sm"
-          >
+          <button className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors text-sm">
             <ShoppingCart className="w-4 h-4" />
             Add to Cart
           </button>
@@ -244,71 +310,79 @@ if (product.showPerSqFtPrice) {
             {product.color && (
               <div>
                 <p className="text-xs text-gray-600 mb-0.5">Color</p>
-                <p className="font-semibold text-gray-900 text-xs">{product.color}</p>
+                <p className="font-semibold text-gray-900 text-xs">
+                  {product.color}
+                </p>
               </div>
             )}
             {product.size && (
               <div>
                 <p className="text-xs text-gray-600 mb-0.5">Size</p>
-                <p className="font-semibold text-gray-900 text-xs">{product.size}</p>
+                <p className="font-semibold text-gray-900 text-xs">
+                  {product.size}
+                </p>
               </div>
             )}
             {product.thickness && (
               <div>
                 <p className="text-xs text-gray-600 mb-0.5">Thickness</p>
-                <p className="font-semibold text-gray-900 text-xs">{product.thickness}mm</p>
+                <p className="font-semibold text-gray-900 text-xs">
+                  {product.thickness}mm
+                </p>
               </div>
             )}
             {product.material?.length > 0 && (
-  <div>
-    <p className="text-xs text-gray-600 mb-0.5">Material</p>
-    <p className="font-semibold text-gray-900 text-xs">
-      {product.material.join(", ")}
-    </p>
-  </div>
-)}
+              <div>
+                <p className="text-xs text-gray-600 mb-0.5">Material</p>
+                <p className="font-semibold text-gray-900 text-xs">
+                  {product.material.join(", ")}
+                </p>
+              </div>
+            )}
 
-{product.pattern?.length > 0 && (
-  <div>
-    <p className="text-xs text-gray-600 mb-0.5">Pattern</p>
-    <p className="font-semibold text-gray-900 text-xs">
-      {product.pattern.join(", ")}
-    </p>
-  </div>
-)}
+            {product.pattern?.length > 0 && (
+              <div>
+                <p className="text-xs text-gray-600 mb-0.5">Pattern</p>
+                <p className="font-semibold text-gray-900 text-xs">
+                  {product.pattern.join(", ")}
+                </p>
+              </div>
+            )}
 
-{product.finish?.length > 0 && (
-  <div>
-    <p className="text-xs text-gray-600 mb-0.5">Finish</p>
-    <p className="font-semibold text-gray-900 text-xs">
-      {product.finish.join(", ")}
-    </p>
-  </div>
-)}
+            {product.finish?.length > 0 && (
+              <div>
+                <p className="text-xs text-gray-600 mb-0.5">Finish</p>
+                <p className="font-semibold text-gray-900 text-xs">
+                  {product.finish.join(", ")}
+                </p>
+              </div>
+            )}
 
-{product.coverageArea && (
-  <div>
-    <p className="text-xs text-gray-600 mb-0.5">Coverage Area</p>
-    <p className="font-semibold text-gray-900 text-xs">
-      {product.coverageArea}
-    </p>
-  </div>
-)}
+            {product.coverageArea && (
+              <div>
+                <p className="text-xs text-gray-600 mb-0.5">Coverage Area</p>
+                <p className="font-semibold text-gray-900 text-xs">
+                  {product.coverageArea}
+                </p>
+              </div>
+            )}
 
-{product.application?.length > 0 && (
-  <div>
-    <p className="text-xs text-gray-600 mb-0.5">Application</p>
-    <p className="font-semibold text-gray-900 text-xs">
-      {product.application.join(", ")}
-    </p>
-  </div>
-)}
+            {product.application?.length > 0 && (
+              <div>
+                <p className="text-xs text-gray-600 mb-0.5">Application</p>
+                <p className="font-semibold text-gray-900 text-xs">
+                  {product.application.join(", ")}
+                </p>
+              </div>
+            )}
 
             {product.stock !== undefined && (
               <div>
                 <p className="text-xs text-gray-600 mb-0.5">Stock</p>
                 <p className="font-semibold text-gray-900 text-xs">
-                  {product.stock > 0 ? `${product.stock} Available` : "Out of Stock"}
+                  {product.stock > 0
+                    ? `${product.stock} Available`
+                    : "Out of Stock"}
                 </p>
               </div>
             )}

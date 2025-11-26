@@ -9,11 +9,16 @@ export default function ProductForm({
   categories = [],
   colorVariants = [],
   patternVariants = [],
+  applications = [],
 }) {
+
+
   const router = useRouter();
   const isEdit = !!product;
 
   const [showCategorySelect, setShowCategorySelect] = useState(false);
+  const [showApplicationSelect, setShowApplicationSelect] = useState(false);
+
 
   const [formData, setFormData] = useState({
     name: product?.name || "",
@@ -45,7 +50,8 @@ export default function ProductForm({
     // ---------------------------------------------------------
     sellBy: product?.sellBy || "box", // box | roll | piece
     showPerSqFtPrice: product?.showPerSqFtPrice || false,
-    perSqFtPrice: product?.perSqFtPrice || "",
+    perSqFtPriceRetail: product?.perSqFtPriceRetail || "",
+    perSqFtPriceEnterprise: product?.perSqFtPriceEnterprise || "",
     material: Array.isArray(product?.material)
       ? product.material.join(", ")
       : product?.material || "",
@@ -56,8 +62,8 @@ export default function ProductForm({
       ? product.finish.join(", ")
       : product?.finish || "",
     application: Array.isArray(product?.application)
-      ? product.application.join(", ")
-      : product?.application || "",
+  ? product.application.map((a) => a._id || a)
+  : [],
 
     coverageArea: product?.coverageArea || "",
   });
@@ -115,8 +121,11 @@ export default function ProductForm({
         // ---------------------------------------------------------
         sellBy: formData.sellBy,
         showPerSqFtPrice: formData.showPerSqFtPrice,
-        perSqFtPrice: formData.perSqFtPrice
-          ? Number(formData.perSqFtPrice)
+        perSqFtPriceRetail: formData.perSqFtPriceRetail
+          ? Number(formData.perSqFtPriceRetail)
+          : undefined,
+        perSqFtPriceEnterprise: formData.perSqFtPriceEnterprise
+          ? Number(formData.perSqFtPriceEnterprise)
           : undefined,
         material: formData.material
           .split(",")
@@ -133,10 +142,10 @@ export default function ProductForm({
 
         coverageArea: formData.coverageArea,
 
-        application: formData.application
-          .split(",")
-          .map((x) => x.trim())
-          .filter(Boolean),
+        application: Array.isArray(formData.application)
+  ? formData.application
+  : [],
+
         category: Array.isArray(formData.category)
           ? formData.category
           : [formData.category],
@@ -328,19 +337,37 @@ export default function ProductForm({
                 {/* PER SQFT PRICE */}
                 {formData.showPerSqFtPrice && (
                   <div>
+                  <div>
                     <label className="block text-gray-700 font-medium mb-2">
-                      Per SqFt Price
+                      Per SqFt Price (Retail)
                     </label>
                     <input
                       type="number"
-                      name="perSqFtPrice"
-                      value={formData.perSqFtPrice}
+                      name="perSqFtPriceRetail"
+                      value={formData.perSqFtPriceRetail}
                       onChange={handleChange}
                       min="0"
                       step="0.01"
                       className="w-full px-4 py-3 border-2 rounded-lg"
                       placeholder="e.g., 22.5"
                     />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Per SqFt Price (Enterprise)
+                    </label>
+                    <input
+                      type="number"
+                      name="perSqFtPriceEnterprise"
+                      value={formData.perSqFtPriceEnterprise}
+                      onChange={handleChange}
+                      min="0"
+                      step="0.01"
+                      className="w-full px-4 py-3 border-2 rounded-lg"
+                      placeholder="e.g., 22.5"
+                    />
+                  </div>
                   </div>
                 )}
               </div>
@@ -452,19 +479,77 @@ export default function ProductForm({
                   />
                 </div>
 
-                <div className="md:col-span-3">
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Application (comma-separated)
-                  </label>
-                  <input
-                    type="text"
-                    name="application"
-                    value={formData.application}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 rounded-lg"
-                    placeholder="bedroom, hall, kitchen"
-                  />
-                </div>
+                {/* APPLICATIONS */}
+<div className="md:col-span-3 mt-6">
+  <label className="block text-gray-700 font-medium mb-2">
+    Applications
+  </label>
+
+  {/* Selected Application Pills */}
+  <div className="flex flex-wrap gap-2 mb-3">
+    {formData.application.map((appId) => {
+      const app = applications.find((a) => a._id === appId);
+      return (
+        <div
+          key={appId}
+          className="flex items-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm"
+        >
+          {app?.name || "Unknown"}
+          <button
+            type="button"
+            onClick={() =>
+              setFormData((prev) => ({
+                ...prev,
+                application: prev.application.filter((id) => id !== appId),
+              }))
+            }
+            className="ml-2 text-blue-700 hover:text-blue-900"
+          >
+            ✕
+          </button>
+        </div>
+      );
+    })}
+
+    {/* Add Application Button */}
+    <button
+      type="button"
+      onClick={() => setShowApplicationSelect(!showApplicationSelect)}
+      className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+    >
+      Add Application
+    </button>
+  </div>
+
+  {/* Dropdown visible only when button is clicked */}
+  {showApplicationSelect && (
+    <select
+      className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg"
+      onChange={(e) => {
+        const selected = e.target.value;
+        if (!selected) return;
+
+        setFormData((prev) => ({
+          ...prev,
+          application: [...new Set([...prev.application, selected])],
+        }));
+
+        setShowApplicationSelect(false);
+      }}
+    >
+      <option value="">Select an application</option>
+
+      {applications
+        .filter((app) => !formData.application.includes(app._id))
+        .map((app) => (
+          <option key={app._id} value={app._id}>
+            {app.name}
+          </option>
+        ))}
+    </select>
+  )}
+</div>
+
               </div>
             </div>
 
