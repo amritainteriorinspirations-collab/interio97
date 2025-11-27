@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import DbConnect from "@/lib/Db/DbConnect";
 import PatternVariant from "@/models/patternVariant";
+import Product from "@/models/product";
 
 export async function GET(req, { params }) {
   try {

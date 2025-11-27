@@ -76,7 +76,8 @@ export default function CategoryPageClient({ products, userRole, headerContent }
 
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="w-full flex items-center justify-center gap-2 bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:border-orange-300 hover:bg-orange-50 transition-all duration-200 shadow-sm"
+            className="w-full flex items-center justify-center gap-2 bg-white border-2 border-gray-200 rounded-md
+             px-4 py-3 text-sm font-semibold text-gray-700 hover:border-orange-300  transition-all duration-200 shadow-sm"
           >
             {showFilters ? <><X className="w-4 h-4" /> Hide Filters</> :
               <><SlidersHorizontal className="w-4 h-4" /> Filters ({filteredProducts.length})</>}
@@ -108,7 +109,7 @@ export default function CategoryPageClient({ products, userRole, headerContent }
 
         {/* Empty State */}
         {filteredProducts.length === 0 ? (
-          <div className="bg-white rounded-xl border-2 border-dashed border-gray-300 p-16 text-center">
+          <div className="bg-white rounded-md border-2 border-dashed border-gray-300 p-16 text-center">
             <div className="text-6xl mb-4">🔍</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
             <p className="text-gray-600">Try adjusting your filters</p>

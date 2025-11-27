@@ -23,7 +23,7 @@ export default async function CategoryPage({ params }) {
       {/* Products Section with Sidebar */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {products.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+          <div className="bg-white rounded-md shadow-sm border border-gray-200 p-12 text-center">
             <div className="text-6xl mb-4">📦</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               No products in this category yet
@@ -35,12 +35,12 @@ export default async function CategoryPage({ params }) {
             products={products}
             userRole={userRole}
             headerContent={
-              <section className="bg-white border border-gray-100 rounded-xl p-4 mb-4">
+              <section className="bg-white border border-gray-100 rounded-md p-4 mb-4">
                 <div className="flex items-center gap-4">
                   {category.image && (
                     <img
                       src={category.image}
-                      className="w-14 h-14 object-cover rounded-lg shadow-sm ring-1 ring-gray-200"
+                      className="w-14 h-14 object-cover rounded-md shadow-sm ring-1 ring-gray-200"
                     />
                   )}
 
@@ -56,12 +56,12 @@ export default async function CategoryPage({ params }) {
                     )}
 
                     <div className="mt-1 flex items-center gap-2 text-xs">
-                      <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-600">
+                      <span className="px-2 py-0.5 rounded-xs bg-gray-100 text-gray-600">
                         {products.length} Products
                       </span>
 
                       {userRole === "enterprise" && (
-                        <span className="px-2 py-0.5 rounded bg-orange-50 text-orange-600">
+                        <span className="px-2 py-0.5 rounded-xs bg-orange-50 text-orange-600">
                           Enterprise Pricing
                         </span>
                       )}

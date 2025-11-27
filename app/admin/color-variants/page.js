@@ -1,7 +1,22 @@
 import Link from "next/link";
-import { getAllColorVariants } from "@/lib/fetchers/colorVariants";
+import { deleteColorVariant, getAllColorVariants } from "@/lib/fetchers/colorVariants";
 import { Plus } from "lucide-react";
+import { revalidatePath } from "next/cache";
 
+/* -------------------- SERVER ACTION -------------------- */
+async function handleDelete(formData) {
+  "use server";
+
+  const id = formData.get("id");
+
+  // You can use your server-side function here ✔
+  await deleteColorVariant(id);
+
+  // Refresh this page to update the list
+  revalidatePath("/admin/color-variants");
+}
+
+/* -------------------- PAGE COMPONENT -------------------- */
 export default async function ColorVariantsPage() {
   const variants = await getAllColorVariants();
 
@@ -45,6 +60,19 @@ export default async function ColorVariantsPage() {
                     >
                       Edit
                     </Link>
+
+                    {/* ---- DELETE FORM ---- */}
+                    <form action={handleDelete} className="inline-block ml-4">
+                      <input type="hidden" name="id" value={v._id} />
+                      <button
+                        type="submit"
+                        className="text-red-600 hover:underline text-sm"
+                      >
+                        Delete
+                      </button>
+                    </form>
+                    {/* --------------------- */}
+                    
                   </td>
                 </tr>
               ))}

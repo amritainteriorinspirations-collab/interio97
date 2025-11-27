@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import DbConnect from "@/lib/Db/DbConnect";
 import ColorVariant from "@/models/colorVariant";
+import Product from "@/models/product";
 
 export async function GET(req, { params }) {
   try {
@@ -26,6 +27,8 @@ export async function PUT(req, { params }) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
+
+// api/color-variants/[id]/route.js
 
 export async function DELETE(req, { params }) {
   try {

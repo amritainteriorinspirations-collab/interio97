@@ -10,8 +10,10 @@ body {
   color: var(--foreground);
 }
 
+
+
 .b{
-  @apply border border-blue-600
+  @apply border border-red-600
 }
 
 
@@ -138,10 +140,8 @@ body {
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #ea580c;
   }
-
-
-
-
   
 }
+
+
 

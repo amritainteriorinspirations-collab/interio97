@@ -10,7 +10,9 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import ProductImageGallery from "./ProductImageGallery";
-import ProductVariants from "./ProductVariants";
+import ProductDetails from "./ProductDetails";
+import ApplicationsGallery from "./ApplicationsGallery";
+import TrustBadges from "./TrustBadges";
 
 export default function ProductPageClient({
   product,
@@ -25,14 +27,7 @@ export default function ProductPageClient({
   const phoneNumber = "+916299811965";
   const isEnterprise = userRole === "enterprise";
 
-    console.log(product)
-
-
-  // -----------------------------
-  // ✅ CLEAN PRICE LOGIC (final)
-  // -----------------------------
-
-  // Pick enterprise or retail fields
+  // ✅ CLEAN PRICE LOGIC
   const discounted = isEnterprise
     ? product.enterpriseDiscountPrice
     : product.retailDiscountPrice;
@@ -43,17 +38,13 @@ export default function ProductPageClient({
     ? product.perSqFtPriceEnterprise
     : product.perSqFtPriceRetail;
 
-  // Check discount
   const hasDiscount = discounted && discounted < original;
 
-  // Final structured values
   let primaryPrice;
   let secondaryPrice = null;
 
-  // CASE A — show price per SqFt
   if (product.showPerSqFtPrice) {
     primaryPrice = perSqFt;
-
     secondaryPrice = {
       discounted: discounted || original,
       original: hasDiscount ? original : null,
@@ -62,11 +53,8 @@ export default function ProductPageClient({
         : 0,
       savings: hasDiscount ? original - discounted : 0,
     };
-  }
-  // CASE B — normal price
-  else {
+  } else {
     primaryPrice = discounted || original;
-
     secondaryPrice = hasDiscount
       ? {
           original,
@@ -113,37 +101,47 @@ export default function ProductPageClient({
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-        {/* Left: Image Gallery - Smaller */}
-        <div className="max-w-md mx-auto w-full">
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+      {/* ===== PRODUCT SECTION ===== */}
+      <div
+        className="
+    grid grid-cols-1 
+    sm:grid-cols-[auto_1fr] 
+    gap-4 sm:gap-6 mb-4
+  "
+      >
+        {/* LEFT: Image Gallery */}
+        <div
+          className="max-w-sm
+   w-full mx-auto sm:mx-0"
+        >
           <ProductImageGallery
             images={product.images}
             productName={product.name}
           />
         </div>
 
-        {/* Right: Product Details */}
-        <div className="space-y-3">
+        {/* RIGHT: Product Info */}
+        <div className="space-y-2.5 w-full">
           {/* Brand & Share */}
           <div className="flex items-center justify-between">
             {product.brand && (
-              <p className="text-neutral-500 font-semibold text-xs uppercase tracking-wide">
+              <p className="text-neutral-500 font-semibold text-[10px] uppercase tracking-wide">
                 {product.brand}
               </p>
             )}
             <button
               onClick={handleShare}
-              className="relative flex items-center gap-1.5 text-gray-600 hover:text-orange-600 transition-colors text-xs font-medium"
+              className="flex items-center gap-1 text-gray-600 hover:text-orange-600 transition-colors text-[10px] font-medium"
             >
               {showCopied ? (
                 <>
-                  <Check className="w-3.5 h-3.5" />
+                  <Check className="w-3 h-3" />
                   <span>Copied!</span>
                 </>
               ) : (
                 <>
-                  <Share2 className="w-3.5 h-3.5" />
+                  <Share2 className="w-3 h-3" />
                   <span>Share</span>
                 </>
               )}
@@ -151,273 +149,182 @@ export default function ProductPageClient({
           </div>
 
           {/* Product Name */}
-          <h1 className="text-xl md:text-xl font-semibold text-gray-900 leading-tight">
+          <h1 className="text-md sm:text-lg font-medium text-gray-900 leading-tight">
             {product.name}
           </h1>
 
-          {/* PRICE BOX */}
-          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-            {/* MAIN ROW */}
-            <div className="flex items-center justify-between">
-              {/* LEFT SIDE — PRIMARY PRICE */}
+          {/* PRICE BOX - Enhanced */}
+          <div className="bg-orange-50 rounded-md p-2.5 border border-orange-200">
+            <div className="flex items-center justify-between gap-3">
+              {/* LEFT: Primary Price */}
               <div>
                 {product.showPerSqFtPrice ? (
-                  <span className="text-2xl font-bold text-gray-900">
+                  <span className="text-[1.2rem] font-bold text-gray-900">
                     ₹{primaryPrice} / SqFt
                   </span>
                 ) : (
-                  <span className="text-2xl font-bold text-gray-900">
-                    ₹{primaryPrice} / {product.sellBy}
+                  <span className="text-[1.2rem] font-bold text-gray-900">
+                    ₹{primaryPrice}
                   </span>
                 )}
 
-                {/* SAVINGS IF DISCOUNT EXISTS */}
                 {secondaryPrice?.savings > 0 && (
-                  <p className="text-xs text-green-600 font-medium">
-                    You save ₹{secondaryPrice.savings}
+                  <p className="text-[10px] text-green-600 font-semibold mt-0.5">
+                    Save ₹{secondaryPrice.savings}
                   </p>
                 )}
               </div>
 
-              {/* RIGHT SIDE — DISCOUNTED + ORIGINAL */}
-              <div className="text-right">
-                {/* Discounted per sellBy (only in perSqFt mode) */}
-                {product.showPerSqFtPrice && (
-                  <>
-                    <span className="text-sm text-gray-900 font-medium block">
-                      ₹{secondaryPrice.discounted} / {product.sellBy}
-                    </span>
-
-                    {/* Original if discount exists */}
-                    {secondaryPrice.original && (
-                      <span className="text-xs text-gray-400 line-through block">
-                        ₹{secondaryPrice.original} / {product.sellBy}
+              {/* RIGHT: Original/Discount */}
+              {secondaryPrice && (
+                <div className="text-right">
+                  {product.showPerSqFtPrice && (
+                    <>
+                      <span className="text-[15px] font-medium text-gray-700 block">
+                        ₹{secondaryPrice.discounted} / {product.sellBy}
                       </span>
-                    )}
-                  </>
-                )}
+                      {secondaryPrice.original && (
+                        <span className="text-[12px] text-gray-400 line-through block">
+                          ₹{secondaryPrice.original} / {product.sellBy}
+                        </span>
+                      )}
+                    </>
+                  )}
 
-                {/* Normal mode original price */}
-                {!product.showPerSqFtPrice && secondaryPrice?.original && (
-                  <span className="text-sm text-gray-400 line-through">
-                    ₹{secondaryPrice.original} / {product.sellBy}
-                  </span>
-                )}
-              </div>
+                  {!product.showPerSqFtPrice && secondaryPrice.original && (
+                    <span className="text-xs text-gray-400 line-through">
+                      ₹{secondaryPrice.original}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* % OFF BELOW */}
-            {secondaryPrice?.discountPercent > 0 && (
-              <p className="text-xs text-green-600 font-semibold mt-1">
-                {secondaryPrice.discountPercent}% OFF
-              </p>
-            )}
-
-            {isEnterprise && (
-              <p className="text-xs text-orange-600 mt-1 font-medium">
-                ✓ Enterprise Price Applied
-              </p>
-            )}
-
-            <p className="text-xs text-gray-600 mt-1">Inclusive of all taxes</p>
+            {/* Discount % & Tags */}
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              {secondaryPrice?.discountPercent > 0 && (
+                <span className="inline-block bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                  {secondaryPrice.discountPercent}% OFF
+                </span>
+              )}
+              {isEnterprise && (
+                <span className="inline-block bg-orange-500 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded">
+                  Enterprise
+                </span>
+              )}
+              <p className="text-[9px] text-gray-600">Incl. all taxes</p>
+            </div>
           </div>
 
+          {/* Color Variants */}
           {colorVariants?.length > 0 && (
-            <div className="mt-4">
-              <p className="text-xs font-medium text-gray-600 mb-1">
-                Color Variants
+            <div>
+              <p className="text-[9px] font-semibold text-gray-700 mb-1.5">
+                COLOR
               </p>
-
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 {colorVariants.map((c) => (
                   <a
                     key={c._id}
                     href={`/product/${c.slug}`}
-                    className="w-12 h-12 border rounded overflow-hidden hover:shadow transition-all"
+                    className="flex flex-col items-center gap-1 group"
                   >
-                    <img
-                      src={c.images?.[0]}
-                      alt={c.name}
-                      className="w-full h-full object-cover"
-                    />
+                    <div className="w-10 h-10 border border-gray-300 rounded overflow-hidden">
+                      <img
+                        src={c.images?.[0]}
+                        alt={c.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <p className="text-[8px] text-center text-gray-600 max-w-[40px] line-clamp-1">
+                      {c.color || c.name}
+                    </p>
                   </a>
                 ))}
               </div>
             </div>
           )}
 
+          {/* Pattern Variants */}
           {patternVariants?.length > 0 && (
-            <div className="mt-4">
-              <p className="text-xs font-medium text-gray-600 mb-1">
-                Pattern Variants
+            <div>
+              <p className="text-[9px] font-semibold text-gray-700 mb-1.5">
+                PATTERN
               </p>
-
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 {patternVariants.map((p) => (
                   <a
                     key={p._id}
                     href={`/product/${p.slug}`}
-                    className="w-12 h-12 border rounded overflow-hidden hover:shadow transition-all"
+                    className="flex flex-col items-center gap-1 group"
                   >
-                    <img
-                      src={p.images?.[0]}
-                      alt={p.name}
-                      className="w-full h-full object-cover"
-                    />
+                    <div className="w-10 h-10 border border-gray-300 rounded overflow-hidden">
+                      <img
+                        src={p.images?.[0]}
+                        alt={p.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <p className="text-[8px] text-center text-gray-600 max-w-[40px] line-clamp-1">
+                      {p.pattern?.[0] || p.name}
+                    </p>
                   </a>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* Add to Cart Button */}
-          <button className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors text-sm">
-            <ShoppingCart className="w-4 h-4" />
-            Add to Cart
-          </button>
-
-          {/* Order Buttons */}
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              onClick={handleWhatsApp}
-              className="flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg font-semibold transition-colors text-xs"
-            >
-              <MessageCircle className="w-4 h-4" />
-              WhatsApp
-            </button>
-            <button
-              onClick={handleCall}
-              className="flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-lg font-semibold transition-colors text-xs"
-            >
-              <Phone className="w-4 h-4" />
-              Call
-            </button>
-            <button
-              onClick={handleCopyNumber}
-              className="relative flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white p-2.5 rounded-lg transition-colors"
-              title="Copy Number"
-            >
-              {showNumberCopied ? (
-                <Check className="w-4 h-4" />
-              ) : (
-                <Copy className="w-4 h-4" />
-              )}
-            </button>
-          </div>
-
-          {/* Product Attributes */}
-          <div className="grid grid-cols-2 gap-2 bg-white rounded-lg p-3 border border-gray-200">
-            {product.color && (
-              <div>
-                <p className="text-xs text-gray-600 mb-0.5">Color</p>
-                <p className="font-semibold text-gray-900 text-xs">
-                  {product.color}
-                </p>
-              </div>
-            )}
-            {product.size && (
-              <div>
-                <p className="text-xs text-gray-600 mb-0.5">Size</p>
-                <p className="font-semibold text-gray-900 text-xs">
-                  {product.size}
-                </p>
-              </div>
-            )}
-            {product.thickness && (
-              <div>
-                <p className="text-xs text-gray-600 mb-0.5">Thickness</p>
-                <p className="font-semibold text-gray-900 text-xs">
-                  {product.thickness}mm
-                </p>
-              </div>
-            )}
-            {product.material?.length > 0 && (
-              <div>
-                <p className="text-xs text-gray-600 mb-0.5">Material</p>
-                <p className="font-semibold text-gray-900 text-xs">
-                  {product.material.join(", ")}
-                </p>
-              </div>
-            )}
-
-            {product.pattern?.length > 0 && (
-              <div>
-                <p className="text-xs text-gray-600 mb-0.5">Pattern</p>
-                <p className="font-semibold text-gray-900 text-xs">
-                  {product.pattern.join(", ")}
-                </p>
-              </div>
-            )}
-
-            {product.finish?.length > 0 && (
-              <div>
-                <p className="text-xs text-gray-600 mb-0.5">Finish</p>
-                <p className="font-semibold text-gray-900 text-xs">
-                  {product.finish.join(", ")}
-                </p>
-              </div>
-            )}
-
-            {product.coverageArea && (
-              <div>
-                <p className="text-xs text-gray-600 mb-0.5">Coverage Area</p>
-                <p className="font-semibold text-gray-900 text-xs">
-                  {product.coverageArea}
-                </p>
-              </div>
-            )}
-
-            {product.application?.length > 0 && (
-              <div>
-                <p className="text-xs text-gray-600 mb-0.5">Application</p>
-                <p className="font-semibold text-gray-900 text-xs">
-                  {product.application.join(", ")}
-                </p>
-              </div>
-            )}
-
-            {product.stock !== undefined && (
-              <div>
-                <p className="text-xs text-gray-600 mb-0.5">Stock</p>
-                <p className="font-semibold text-gray-900 text-xs">
-                  {product.stock > 0
-                    ? `${product.stock} Available`
-                    : "Out of Stock"}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Description */}
-          {product.description && (
-            <div className="bg-white rounded-lg p-3 border border-gray-200">
-              <h3 className="text-sm font-bold text-gray-900 mb-1.5">
-                Product Description
-              </h3>
-              <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
-                {product.description}
-              </p>
             </div>
           )}
 
           {/* Featured Badge */}
           {product.isFeatured && (
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-2.5">
-              <p className="text-orange-700 font-medium flex items-center gap-2 text-xs">
+            <div className="bg-orange-50 border border-orange-200 rounded-md p-2 inline-block">
+              <p className="text-orange-700 font-semibold flex items-center gap-1 text-[9px]">
                 <span>⭐</span>
-                Featured Product
+                Featured
               </p>
             </div>
           )}
+
+          {/* Add to Cart Button */}
+          <button className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-3 py-2.5 rounded-sm font-semibold transition-colors text-sm">
+            <ShoppingCart className="w-4 h-4  " />
+            <span className="">Add to Cart</span>
+          </button>
+
+          {/* Contact Buttons */}
+          <div className="grid grid-cols-12 gap-1.5">
+            <button
+              onClick={handleWhatsApp}
+              className="col-span-5 flex items-center justify-center gap-1 bg-green-600 hover:bg-green-700 text-white px-2 py-2.5 rounded-sm font-semibold transition-colors text-[12px]"
+            >
+              <MessageCircle className="w-3 h-3" />
+              WhatsApp
+            </button>
+            <button
+              onClick={handleCall}
+              className="col-span-5 flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-2 py-2.5 rounded-sm font-semibold transition-colors text-[12px]"
+            >
+              <Phone className="w-3 h-3" />
+              Call
+            </button>
+            <button
+              onClick={handleCopyNumber}
+              className="col-span-2 flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white py-2.5 rounded-sm transition-colors"
+              title="Copy Phone Number"
+            >
+              {showNumberCopied ? (
+                <Check className="w-3 h-3" />
+              ) : (
+                <Copy className="w-3 h-3" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Variants Section */}
-      {variants && variants.length > 0 && (
-        <div className="mt-6">
-          <ProductVariants variants={variants} currentSlug={product.slug} />
-        </div>
-      )}
+      {/* ===== DETAILS SECTION ===== */}
+      <ProductDetails product={product} />
+
+      <TrustBadges />
     </div>
   );
 }

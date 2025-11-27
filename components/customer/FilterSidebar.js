@@ -148,7 +148,7 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
     (filters.priceRange[1] < priceRange.max ? 1 : 0);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
       {/* Header - Sticky */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
@@ -168,7 +168,7 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
                 <X className="w-3.5 h-3.5" />
                 <span className="sr-only">Clear</span>
                 <span className="text-xs font-medium">Clear</span>
-                <span className="ml-1 inline-block bg-orange-50 text-orange-600 text-xs px-2 py-0.5 rounded-full">
+                <span className="ml-1 inline-block bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-xs">
                   {activeFilterCount}
                 </span>
               </button>
@@ -185,7 +185,7 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full px-2 py-2 text-xs border border-gray-200 rounded-md focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-100 transition-all bg-white"
+              className="w-full px-2 py-2 text-xs border border-gray-200 rounded-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-100 transition-all bg-white"
             >
               <option value="newest">Newest First</option>
               <option value="priceLowHigh">Price: Low to High</option>
@@ -204,14 +204,14 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
                 step="100"
                 value={filters.priceRange[1]}
                 onChange={handlePriceChange}
-                className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                className="w-full h-1.5 bg-gray-200 rounded-sm appearance-none cursor-pointer accent-orange-500"
                 style={{
                   background: `linear-gradient(to right, #f97316 0%, #f97316 ${((filters.priceRange[1] - priceRange.min) / (priceRange.max - priceRange.min)) * 100}%, #e5e7eb ${((filters.priceRange[1] - priceRange.min) / (priceRange.max - priceRange.min)) * 100}%, #e5e7eb 100%)`
                 }}
               />
               <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500">₹{priceRange.min.toLocaleString('en-IN')}</span>
-                <span className="text-xs font-semibold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">₹{filters.priceRange[1].toLocaleString('en-IN')}</span>
+                <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-xs">₹{filters.priceRange[1].toLocaleString('en-IN')}</span>
                 <span className="text-gray-500">₹{priceRange.max.toLocaleString('en-IN')}</span>
               </div>
             </div>
