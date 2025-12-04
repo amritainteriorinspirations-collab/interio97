@@ -4,8 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { deleteProduct } from "@/lib/fetchers/products";
-import { Edit, Trash2, Search, Package, Filter } from "lucide-react";
+import { Edit, Trash2, Search, Package, Info, Eye } from "lucide-react";
 import Toast from "./Toast";
+import ProductDetailsPopup from "./ProductDetailsPopup";
 
 export default function ProductsTable({ products, categories }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,6 +51,22 @@ export default function ProductsTable({ products, categories }) {
       setDeleting(null);
     }
   };
+
+  // helper to show value or dash
+  const showOrDash = (val, formatter) => {
+    if (
+      val === null ||
+      val === undefined ||
+      (Array.isArray(val) && val.length === 0) ||
+      val === ""
+    ) {
+      return "-";
+    }
+    return formatter ? formatter(val) : val;
+  };
+
+  const money = (num) =>
+    typeof num === "number" ? `₹${num.toLocaleString("en-IN")}` : "-";
 
   return (
     <>
@@ -118,21 +135,32 @@ export default function ProductsTable({ products, categories }) {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+              <tr className="">
+                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Product
                 </th>
 
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Categories
+                </th>
+
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   SKU
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Price
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Stock
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Details
+                </th>
+
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -140,7 +168,7 @@ export default function ProductsTable({ products, categories }) {
             <tbody className="divide-y divide-gray-200">
               {filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-4 py-12 text-center">
+                  <td colSpan="7" className="px-4 py-12 text-center">
                     <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                     <p className="text-sm text-gray-500">No products found</p>
                   </td>
@@ -151,6 +179,7 @@ export default function ProductsTable({ products, categories }) {
                     key={product._id}
                     className="hover:bg-gray-50 transition-colors"
                   >
+                    {/* Product column */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {product.images && product.images[0] ? (
@@ -174,29 +203,90 @@ export default function ProductsTable({ products, categories }) {
                             </p>
                           )}
                         </div>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {Array.isArray(product.category) &&
-                            product.category.map((cat) => (
-                              <span
-                                key={cat._id}
-                                className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded"
-                              >
-                                {cat.name}
-                              </span>
-                            ))}
-                        </div>
                       </div>
                     </td>
+
+                    {/* Categories column (new) */}
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {Array.isArray(product.category) &&
+                        product.category.length > 0 ? (
+                          product.category.map((cat) => (
+                            <span
+                              key={cat._id}
+                              className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded"
+                            >
+                              {cat.name}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-[10px] px-2 py-0.5 bg-gray-50 text-gray-400 rounded">
+                            -
+                          </span>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* SKU */}
                     <td className="px-4 py-3">
                       <code className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-700">
-                        {product.sku}
+                        {showOrDash(product.sku)}
                       </code>
                     </td>
+
+                    {/* Price column: show only discount prices and per sqft if enabled */}
                     <td className="px-4 py-3">
-                      <p className="text-sm font-semibold text-gray-900">
-                        ₹{product.retailPrice?.toLocaleString("en-IN")}
-                      </p>
+                      <div className="text-sm text-gray-900 space-y-1">
+                        <div>
+                          <span className="text-xs text-gray-500">
+                            Retail (discount):{" "}
+                          </span>
+                          <span className="font-semibold">
+                            {product.retailDiscountPrice != null
+                              ? money(product.retailDiscountPrice)
+                              : "-"}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="text-xs text-gray-500">
+                            Enterprise (discount):{" "}
+                          </span>
+                          <span className="font-semibold">
+                            {product.enterpriseDiscountPrice != null
+                              ? money(product.enterpriseDiscountPrice)
+                              : "-"}
+                          </span>
+                        </div>
+
+                        {product.showPerSqFtPrice && (
+                          <>
+                            <div>
+                              <span className="text-xs text-gray-500">
+                                Per Sq Ft (Retail):{" "}
+                              </span>
+                              <span className="font-semibold">
+                                {product.perSqFtPriceRetail != null
+                                  ? money(product.perSqFtPriceRetail)
+                                  : "-"}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-xs text-gray-500">
+                                Per Sq Ft (Enterprise):{" "}
+                              </span>
+                              <span className="font-semibold">
+                                {product.perSqFtPriceEnterprise != null
+                                  ? money(product.perSqFtPriceEnterprise)
+                                  : "-"}
+                              </span>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </td>
+
+                    {/* Stock */}
                     <td className="px-4 py-3">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -210,8 +300,33 @@ export default function ProductsTable({ products, categories }) {
                         {product.stock}
                       </span>
                     </td>
+
+                    {/* Details column - info icon with hover popup */}
+                    <td className="px-4 py-3 text-center">
+                      <div className="relative inline-block group">
+                        <button
+                          type="button"
+                          className="p-1.5 bg-gray-50 hover:bg-gray-100 rounded-md border border-gray-100"
+                          aria-label="Product details"
+                        >
+                          <Info className="w-4 h-4 text-gray-600" />
+                        </button>
+
+                        {/* Popup Component */}
+                        <ProductDetailsPopup product={product} />
+                      </div>
+                    </td>
+
+                    {/* Actions */}
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
+                        <Link
+                          href={`/product/${product.slug}`}
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          title="View"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Link>
                         <Link
                           href={`/admin/products/${product.slug}`}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"

@@ -58,7 +58,9 @@ export async function GET(req) {
 
     const products = await Product.find(query)
       .populate("category")
-      .populate("application"); // important
+      .populate("application")
+      .populate("colorVariant")
+      .populate("patternVariant"); // important
 
     return NextResponse.json({ success: true, data: products });
   } catch (error) {

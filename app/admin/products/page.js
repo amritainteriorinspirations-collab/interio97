@@ -22,7 +22,7 @@ export default async function ProductsPage() {
         </div>
         <Link
           href="/admin/products/new"
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition-colors"
+          className="flex items-center whitespace-nowrap gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Product
