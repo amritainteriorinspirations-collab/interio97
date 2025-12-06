@@ -62,7 +62,7 @@ export default function ApplicationTable({ initialData }) {
 
               <td className="p-3">{app.desc || "-"}</td>
 
-              <td className="p-3 flex items-center gap-4">
+              <td className="p-3 flex items-center gap-4 ">
                 <Link
                   href={`/admin/applications/${app._id}`}
                   className="text-blue-600 underline"

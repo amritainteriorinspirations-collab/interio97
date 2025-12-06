@@ -5,19 +5,25 @@ import { useState, useEffect, useMemo } from "react";
 import { X, SlidersHorizontal } from "lucide-react";
 import FilterAccordionItem from "./FilterAccordionItem";
 
-export default function FilterSidebar({ products, onFilterChange, userRole = "user" }) {
+export default function FilterSidebar({
+  products,
+  onFilterChange,
+  userRole = "user",
+}) {
   // 🎯 Calculate ACTUAL min/max prices based on products and user role
   const priceRange = useMemo(() => {
     if (!products || products.length === 0) {
       return { min: 0, max: 100000 };
     }
 
-    const prices = products.map(p => {
-      if (userRole === "enterprise") {
-        return p.enterpriseDiscountPrice || p.enterprisePrice || 0;
-      }
-      return p.retailDiscountPrice || p.retailPrice || 0;
-    }).filter(price => price > 0);
+    const prices = products
+      .map((p) => {
+        if (userRole === "enterprise") {
+          return p.enterpriseDiscountPrice || p.enterprisePrice || 0;
+        }
+        return p.retailDiscountPrice || p.retailPrice || 0;
+      })
+      .filter((price) => price > 0);
 
     if (prices.length === 0) {
       return { min: 0, max: 100000 };
@@ -25,11 +31,11 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
 
     const min = Math.min(...prices);
     const max = Math.max(...prices);
-    
+
     // Round to nearest 100 for cleaner values
     return {
       min: Math.floor(min / 100) * 100,
-      max: Math.ceil(max / 100) * 100
+      max: Math.ceil(max / 100) * 100,
     };
   }, [products, userRole]);
 
@@ -50,50 +56,63 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
 
   // Update price range when products or userRole changes
   useEffect(() => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      priceRange: [priceRange.min, priceRange.max]
+      priceRange: [priceRange.min, priceRange.max],
     }));
   }, [priceRange.min, priceRange.max]);
 
   // Extract unique values from products
-  const uniqueColors = useMemo(() => 
-    [...new Set(products.map(p => p.color).filter(Boolean))].sort(),
+  const uniqueColors = useMemo(
+    () => [...new Set(products.map((p) => p.color).filter(Boolean))].sort(),
     [products]
   );
-  
-  const uniqueSizes = useMemo(() => 
-    [...new Set(products.map(p => p.size).filter(Boolean))].sort(),
+
+  const uniqueSizes = useMemo(
+    () => [...new Set(products.map((p) => p.size).filter(Boolean))].sort(),
     [products]
   );
-  
-  const uniqueThicknesses = useMemo(() => 
-    [...new Set(products.map(p => p.thickness).filter(Boolean))].sort((a, b) => a - b),
+
+  const uniqueThicknesses = useMemo(
+    () =>
+      [...new Set(products.map((p) => p.thickness).filter(Boolean))].sort(
+        (a, b) => a - b
+      ),
     [products]
   );
-  
-  const uniqueBrands = useMemo(() => 
-    [...new Set(products.map(p => p.brand).filter(Boolean))].sort(),
+
+  const uniqueBrands = useMemo(
+    () => [...new Set(products.map((p) => p.brand).filter(Boolean))].sort(),
     [products]
   );
-  
-  const uniqueMaterials = useMemo(() => 
-    [...new Set(products.flatMap(p => p.material || []))].sort(),
+
+  const uniqueMaterials = useMemo(
+    () => [...new Set(products.flatMap((p) => p.material || []))].sort(),
     [products]
   );
-  
-  const uniquePatterns = useMemo(() => 
-    [...new Set(products.flatMap(p => p.pattern || []))].sort(),
+
+  const uniquePatterns = useMemo(
+    () => [...new Set(products.flatMap((p) => p.pattern || []))].sort(),
     [products]
   );
-  
-  const uniqueFinishes = useMemo(() => 
-    [...new Set(products.flatMap(p => p.finish || []))].sort(),
+
+  const uniqueFinishes = useMemo(
+    () => [...new Set(products.flatMap((p) => p.finish || []))].sort(),
     [products]
   );
-  
-  const uniqueApplications = useMemo(() => 
-    [...new Set(products.flatMap(p => (p.application || []).map(app => app.slug)))].sort(),
+
+  const uniqueApplications = useMemo(
+    () =>
+      [
+        ...new Set(
+          products.flatMap(
+            (p) =>
+              (p.application || []) // ensures p.application is an array
+                .map((app) => app.slug) // maps to the slug (which might be null/undefined)
+                .filter(Boolean) // ✅ FIX: Remove all falsy values (null, undefined, '')
+          )
+        ),
+      ].sort(),
     [products]
   );
 
@@ -104,17 +123,17 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
 
   const handlePriceChange = (e) => {
     const value = parseInt(e.target.value);
-    setFilters(prev => ({ 
-      ...prev, 
-      priceRange: [priceRange.min, value] 
+    setFilters((prev) => ({
+      ...prev,
+      priceRange: [priceRange.min, value],
     }));
   };
 
   const handleCheckboxChange = (category, value) => {
-    setFilters(prev => {
+    setFilters((prev) => {
       const currentValues = prev[category];
       const newValues = currentValues.includes(value)
-        ? currentValues.filter(v => v !== value)
+        ? currentValues.filter((v) => v !== value)
         : [...currentValues, value];
       return { ...prev, [category]: newValues };
     });
@@ -207,13 +226,27 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
                 onChange={handlePriceChange}
                 className="w-full h-1.5 bg-gray-200 rounded-sm appearance-none cursor-pointer accent-orange-500"
                 style={{
-                  background: `linear-gradient(to right, #f97316 0%, #f97316 ${((filters.priceRange[1] - priceRange.min) / (priceRange.max - priceRange.min)) * 100}%, #e5e7eb ${((filters.priceRange[1] - priceRange.min) / (priceRange.max - priceRange.min)) * 100}%, #e5e7eb 100%)`
+                  background: `linear-gradient(to right, #f97316 0%, #f97316 ${
+                    ((filters.priceRange[1] - priceRange.min) /
+                      (priceRange.max - priceRange.min)) *
+                    100
+                  }%, #e5e7eb ${
+                    ((filters.priceRange[1] - priceRange.min) /
+                      (priceRange.max - priceRange.min)) *
+                    100
+                  }%, #e5e7eb 100%)`,
                 }}
               />
               <div className="flex justify-between items-center text-xs">
-                <span className="text-gray-500">₹{priceRange.min.toLocaleString('en-IN')}</span>
-                <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-xs">₹{filters.priceRange[1].toLocaleString('en-IN')}</span>
-                <span className="text-gray-500">₹{priceRange.max.toLocaleString('en-IN')}</span>
+                <span className="text-gray-500">
+                  ₹{priceRange.min.toLocaleString("en-IN")}
+                </span>
+                <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-xs">
+                  ₹{filters.priceRange[1].toLocaleString("en-IN")}
+                </span>
+                <span className="text-gray-500">
+                  ₹{priceRange.max.toLocaleString("en-IN")}
+                </span>
               </div>
             </div>
           </FilterAccordionItem>
@@ -222,12 +255,15 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
           {uniqueMaterials.length > 0 && (
             <FilterAccordionItem title="Material">
               <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                {uniqueMaterials.map(mat => (
-                  <label key={mat} className="flex items-center cursor-pointer group">
+                {uniqueMaterials.map((mat) => (
+                  <label
+                    key={mat}
+                    className="flex items-center cursor-pointer group"
+                  >
                     <input
                       type="checkbox"
                       checked={filters.materials.includes(mat)}
-                      onChange={() => handleCheckboxChange('materials', mat)}
+                      onChange={() => handleCheckboxChange("materials", mat)}
                       className="w-3 h-3 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
                     />
                     <span className="ml-2 text-xs text-gray-700 group-hover:text-orange-600 transition-colors">
@@ -243,12 +279,15 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
           {uniquePatterns.length > 0 && (
             <FilterAccordionItem title="Pattern">
               <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                {uniquePatterns.map(pat => (
-                  <label key={pat} className="flex items-center cursor-pointer group">
+                {uniquePatterns.map((pat) => (
+                  <label
+                    key={pat}
+                    className="flex items-center cursor-pointer group"
+                  >
                     <input
                       type="checkbox"
                       checked={filters.patterns.includes(pat)}
-                      onChange={() => handleCheckboxChange('patterns', pat)}
+                      onChange={() => handleCheckboxChange("patterns", pat)}
                       className="w-3 h-3 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
                     />
                     <span className="ml-2 text-xs text-gray-700 group-hover:text-orange-600 transition-colors">
@@ -264,12 +303,15 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
           {uniqueFinishes.length > 0 && (
             <FilterAccordionItem title="Finish">
               <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                {uniqueFinishes.map(fin => (
-                  <label key={fin} className="flex items-center cursor-pointer group">
+                {uniqueFinishes.map((fin) => (
+                  <label
+                    key={fin}
+                    className="flex items-center cursor-pointer group"
+                  >
                     <input
                       type="checkbox"
                       checked={filters.finishes.includes(fin)}
-                      onChange={() => handleCheckboxChange('finishes', fin)}
+                      onChange={() => handleCheckboxChange("finishes", fin)}
                       className="w-3 h-3 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
                     />
                     <span className="ml-2 text-xs text-gray-700 group-hover:text-orange-600 transition-colors">
@@ -285,16 +327,19 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
           {uniqueApplications.length > 0 && (
             <FilterAccordionItem title="Application">
               <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                {uniqueApplications.map(app => (
-                  <label key={app} className="flex items-center cursor-pointer group">
+                {uniqueApplications.map((app) => (
+                  <label
+                    key={app}
+                    className="flex items-center cursor-pointer group"
+                  >
                     <input
                       type="checkbox"
                       checked={filters.applications.includes(app)}
-                      onChange={() => handleCheckboxChange('applications', app)}
+                      onChange={() => handleCheckboxChange("applications", app)}
                       className="w-3 h-3 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
                     />
                     <span className="ml-2 text-xs text-gray-700 group-hover:text-orange-600 transition-colors capitalize">
-                      {app.replace(/-/g, ' ')}
+                      {app.replace(/-/g, " ")}
                     </span>
                   </label>
                 ))}
@@ -306,12 +351,15 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
           {uniqueColors.length > 0 && (
             <FilterAccordionItem title="Color">
               <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                {uniqueColors.map(color => (
-                  <label key={color} className="flex items-center cursor-pointer group">
+                {uniqueColors.map((color) => (
+                  <label
+                    key={color}
+                    className="flex items-center cursor-pointer group"
+                  >
                     <input
                       type="checkbox"
                       checked={filters.colors.includes(color)}
-                      onChange={() => handleCheckboxChange('colors', color)}
+                      onChange={() => handleCheckboxChange("colors", color)}
                       className="w-3 h-3 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
                     />
                     <span className="ml-2 text-xs text-gray-700 group-hover:text-orange-600 transition-colors capitalize">
@@ -329,7 +377,12 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
               <input
                 type="checkbox"
                 checked={filters.inStockOnly}
-                onChange={(e) => setFilters(prev => ({ ...prev, inStockOnly: e.target.checked }))}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    inStockOnly: e.target.checked,
+                  }))
+                }
                 className="w-3 h-3 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
               />
               <span className="ml-2 text-xs text-gray-700 group-hover:text-orange-600 transition-colors font-medium">
@@ -342,12 +395,15 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
           {uniqueSizes.length > 0 && (
             <FilterAccordionItem title="Size">
               <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                {uniqueSizes.map(size => (
-                  <label key={size} className="flex items-center cursor-pointer group">
+                {uniqueSizes.map((size) => (
+                  <label
+                    key={size}
+                    className="flex items-center cursor-pointer group"
+                  >
                     <input
                       type="checkbox"
                       checked={filters.sizes.includes(size)}
-                      onChange={() => handleCheckboxChange('sizes', size)}
+                      onChange={() => handleCheckboxChange("sizes", size)}
                       className="w-3 h-3 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
                     />
                     <span className="ml-2 text-xs text-gray-700 group-hover:text-orange-600 transition-colors">
@@ -363,12 +419,17 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
           {uniqueThicknesses.length > 0 && (
             <FilterAccordionItem title="Thickness">
               <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                {uniqueThicknesses.map(thickness => (
-                  <label key={thickness} className="flex items-center cursor-pointer group">
+                {uniqueThicknesses.map((thickness) => (
+                  <label
+                    key={thickness}
+                    className="flex items-center cursor-pointer group"
+                  >
                     <input
                       type="checkbox"
                       checked={filters.thicknesses.includes(thickness)}
-                      onChange={() => handleCheckboxChange('thicknesses', thickness)}
+                      onChange={() =>
+                        handleCheckboxChange("thicknesses", thickness)
+                      }
                       className="w-3 h-3 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
                     />
                     <span className="ml-2 text-xs text-gray-700 group-hover:text-orange-600 transition-colors">
@@ -384,12 +445,15 @@ export default function FilterSidebar({ products, onFilterChange, userRole = "us
           {uniqueBrands.length > 0 && (
             <FilterAccordionItem title="Brand">
               <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                {uniqueBrands.map(brand => (
-                  <label key={brand} className="flex items-center cursor-pointer group">
+                {uniqueBrands.map((brand) => (
+                  <label
+                    key={brand}
+                    className="flex items-center cursor-pointer group"
+                  >
                     <input
                       type="checkbox"
                       checked={filters.brands.includes(brand)}
-                      onChange={() => handleCheckboxChange('brands', brand)}
+                      onChange={() => handleCheckboxChange("brands", brand)}
                       className="w-3 h-3 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
                     />
                     <span className="ml-2 text-xs text-gray-700 group-hover:text-orange-600 transition-colors">

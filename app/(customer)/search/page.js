@@ -14,7 +14,10 @@ export default async function SearchPage({ searchParams }) {
 
   // --- HEADER CONTENT (same format as Category Page) ---
   const headerContent = (
-    <section className="bg-white border border-gray-100 rounded-md p-4 mb-4">
+    <section
+      key={`search-header-${query}`}
+      className="bg-white border border-gray-100 rounded-md p-4 mb-4"
+    >
       <h1 className="text-lg font-semibold text-gray-900">
         Search Results for: <span className="text-orange-600">"{query}"</span>
       </h1>

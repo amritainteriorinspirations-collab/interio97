@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { deleteApplication, getAllApplications } from "@/lib/fetchers/applications";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, EyeIcon } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
 /* -------------------- SERVER ACTION -------------------- */
@@ -73,10 +73,17 @@ export default async function ApplicationsPage() {
                     <td className="py-3 px-4 text-gray-600 line-clamp-1">
                       {app.desc || "-"}
                     </td>
-                    <td className="py-3 px-4 text-right space-x-2">
+                    <td className="py-3 px-4 text-right space-x-2 whitespace-nowrap">
+                      <Link
+                        href={`/applications/${app?.slug}`}
+                        className="p-1 bg-green-100 rounded text-xs inline-flex items-center gap-1 text-green-800 hover:text-green-800 transition font-medium"
+                      >
+                        <EyeIcon className="w-3 h-3" />
+                        View
+                      </Link>
                       <Link
                         href={`/admin/applications/${app._id}`}
-                        className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 transition font-medium"
+                        className="p-1 bg-blue-100 rounded text-xs inline-flex items-center gap-1 text-blue-800 hover:text-blue-800 transition font-medium"
                       >
                         <Edit className="w-3 h-3" />
                         Edit
@@ -86,7 +93,7 @@ export default async function ApplicationsPage() {
                         <input type="hidden" name="id" value={app._id} />
                         <button
                           type="submit"
-                          className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 transition font-medium"
+                          className="p-1 bg-red-100 rounded text-xs inline-flex items-center gap-1 text-red-800 hover:text-red-800 transition font-medium"
                         >
                           <Trash2 className="w-3 h-3" />
                           Delete

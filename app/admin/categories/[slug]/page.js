@@ -1,4 +1,4 @@
-import { getCategoryBySlug } from "@/lib/fetchers/categories";
+import { getCategoryBySlug } from "@/lib/fetchers/serverCategories";
 import CategoryForm from "@/components/admin/CategoryForm";
 import { notFound } from "next/navigation";
 

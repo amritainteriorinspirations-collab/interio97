@@ -61,15 +61,22 @@ export default function ProductCardGrid({ product, userRole }) {
     product.images && product.images.length > 0 ? product.images[0] : null;
 
   return (
-    <Link href={`/product/${product.slug}`} className="block b min-w-44">
-      <article className="group bg-white rounded-md border border-gray-200 hover:shadow-sm transition-shadow duration-250 overflow-hidden h-full flex flex-col">
+    <Link href={`/product/${product.slug}`} className="block min-w-44">
+      <article className="group bg-white rounded-md border border-gray-200 hover:shadow-sm 
+      transition-shadow duration-250 overflow-hidden flex flex-col">
         {/* Image: wider aspect to make card shorter */}
         <div className="relative aspect-[4/3] bg-gray-50 overflow-hidden flex-shrink-0">
           {mainImage ? (
             <img
               src={mainImage}
               alt={product.name}
-              className="w-full h-full object-contain group-hover:scale-[1.03] transition-transform duration-400"
+              className="
+                w-full h-full 
+                object-contain 
+                p-2 
+                group-hover:scale-[1.03] 
+                transition-transform duration-400
+              "
               loading="lazy"
             />
           ) : (
@@ -80,7 +87,7 @@ export default function ProductCardGrid({ product, userRole }) {
         </div>
 
         {/* Info */}
-        <div className="px-3 py-2 flex flex-col flex-grow">
+        <div className="px-3 py-2 flex flex-col flex-grow ">
           {/* Brand */}
           {product.brand && (
             <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wide truncate mb-1">

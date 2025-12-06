@@ -60,11 +60,15 @@ export default function CategoryForm({ category = null }) {
   const isEdit = !!category;
 
   const [formData, setFormData] = useState({
-    name: category?.name || "",
-    slug: category?.slug || "",
-    description: category?.description || "",
-    image: category?.image || "",
-  });
+  name: category?.name || "",
+  slug: category?.slug || "",
+  description: category?.description || "",
+  image: category?.image || "",
+
+  // ⭐ NEW FIELDS
+  isTrending: category?.isTrending || false,
+  trendingTagline: category?.trendingTagline || "",
+});
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -182,7 +186,7 @@ export default function CategoryForm({ category = null }) {
 
           {/* Image URL */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-2">
+            <label className=" text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-2">
               <ImageIcon className="w-4 h-4" />
               Image URL
             </label>
@@ -211,7 +215,56 @@ export default function CategoryForm({ category = null }) {
               </div>
             )}
           </div>
+
+{/* Trending Collection Controls */}
+<div className="border border-gray-300 rounded-md p-4 bg-gray-50">
+  <label className="flex items-center gap-2 mb-3">
+    <input
+      type="checkbox"
+      name="isTrending"
+      checked={formData.isTrending}
+      onChange={(e) =>
+        setFormData((prev) => ({
+          ...prev,
+          isTrending: e.target.checked,
+        }))
+      }
+      className="w-4 h-4"
+    />
+    <span className="text-sm font-medium text-gray-700">Mark as Trending Collection</span>
+  </label>
+
+  {/* Tagline Input */}
+  {formData.isTrending && (
+    <div className="mt-3">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        Trending Tagline
+      </label>
+      <input
+        type="text"
+        name="trendingTagline"
+        value={formData.trendingTagline}
+        onChange={(e) =>
+          setFormData((prev) => ({
+            ...prev,
+            trendingTagline: e.target.value,
+          }))
+        }
+        placeholder="e.g., Modern Designs Loved This Week"
+        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+      />
+      <p className="text-xs text-gray-500 mt-1">
+        Optional — shown under category name in Trending Collections
+      </p>
+    </div>
+  )}
+</div>
+
+
+
         </div>
+
+        
 
         {/* Action Buttons */}
         <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200">

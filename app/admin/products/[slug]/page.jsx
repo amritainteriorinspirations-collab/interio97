@@ -1,5 +1,5 @@
-import { getProductBySlug } from "@/lib/fetchers/products";
-import { getAllCategories } from "@/lib/fetchers/categories";
+import { getProductBySlug } from "@/lib/fetchers/serverProducts";
+import { getAllCategories } from "@/lib/fetchers/serverCategories";
 import { getAllColorVariants } from "@/lib/fetchers/colorVariants";
 import { getAllPatternVariants } from "@/lib/fetchers/patternVariants";
 import ProductForm from "@/components/admin/ProductForm";

@@ -12,6 +12,8 @@ const CategorySchema = new Schema(
     slug: { type: String, unique: true, required: true }, // Used in URL (e.g., /wooden-flooring)
     description: String, // Optional category description
     image: String, // Banner or thumbnail for category
+    isTrending: { type: Boolean, default: false },
+    trendingTagline: { type: String, default: "" },
   },
   { timestamps: true }
 );

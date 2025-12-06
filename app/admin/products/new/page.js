@@ -2,7 +2,7 @@
 
 import ProductForm from "@/components/admin/ProductForm";
 import { getAllApplications } from "@/lib/fetchers/applications";
-import { getAllCategories } from "@/lib/fetchers/categories";
+import { getAllCategories } from "@/lib/fetchers/serverCategories";
 import { getAllColorVariants } from "@/lib/fetchers/colorVariants";
 import { getAllPatternVariants } from "@/lib/fetchers/patternVariants";
 

@@ -99,7 +99,7 @@ const ColorVariantRow = ({ variant, colorProductsMap }) => (
     </td>
 
     {/* Actions */}
-    <td className="py-3 px-4 text-right space-x-2">
+    <td className="py-3 px-4 text-right space-x-2 whitespace-nowrap">
       <Link
         href={`/admin/variants/color/${variant._id}`}
         className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 transition text-sm font-medium"
@@ -146,7 +146,7 @@ const PatternVariantRow = ({ variant, patternProductsMap }) => (
     </td>
 
     {/* Actions */}
-    <td className="py-3 px-4 text-right space-x-2">
+    <td className="py-3 px-4 text-right space-x-2 whitespace-nowrap">
       <Link
         href={`/admin/variants/pattern/${variant._id}`}
         className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 transition text-sm font-medium"
@@ -250,7 +250,9 @@ export default async function VariantsManagementPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Variants Management</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Variants Management
+        </h1>
         <p className="text-gray-600 mt-2">
           Manage color and pattern variants for your products
         </p>

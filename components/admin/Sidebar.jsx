@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderOpen, Package, LogOut, Palette, Blocks } from "lucide-react";
+import { LayoutDashboard, FolderOpen, Package, LogOut, Palette, Blocks, GalleryHorizontal } from "lucide-react";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -13,6 +13,7 @@ export default function Sidebar() {
     { name: "Products", path: "/admin/products", icon: Package },
     { name: "Variants", path: "/admin/variants", icon: Palette },
     { name: "Applications", path: "/admin/applications", icon: Blocks },
+    { name: "Carousel", path: "/admin/carousel", icon: GalleryHorizontal },
   ];
 
   return (

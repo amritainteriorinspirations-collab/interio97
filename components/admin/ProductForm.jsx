@@ -1,3 +1,5 @@
+// components/admin/ProductForm.jsx
+
 "use client";
 
 import { useState } from "react";
@@ -57,7 +59,15 @@ const SelectField = ({ label, required, options, ...props }) => (
 );
 
 // Tag Input Component
-const TagInput = ({ label, required, selectedIds, items, onAdd, onRemove, addButtonLabel }) => {
+const TagInput = ({
+  label,
+  required,
+  selectedIds,
+  items,
+  onAdd,
+  onRemove,
+  addButtonLabel,
+}) => {
   const [showSelect, setShowSelect] = useState(false);
 
   return (
@@ -68,7 +78,9 @@ const TagInput = ({ label, required, selectedIds, items, onAdd, onRemove, addBut
       </label>
       <div className="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md bg-gray-50 min-h-10 mb-2">
         {selectedIds.length === 0 ? (
-          <span className="text-gray-400 text-xs self-center">None selected</span>
+          <span className="text-gray-400 text-xs self-center">
+            None selected
+          </span>
         ) : (
           selectedIds.map((id) => {
             const item = items.find((i) => i._id === id);
@@ -156,6 +168,7 @@ export default function ProductForm({
     variantGroupId: product?.variantGroupId || "",
     tags: product?.tags?.join(", ") || "",
     isFeatured: product?.isFeatured || false,
+    isPopular: product?.isPopular || false,
     colorVariant: product?.colorVariant || "",
     patternVariant: product?.patternVariant || "",
     sellBy: product?.sellBy || "box",
@@ -343,7 +356,9 @@ export default function ProductForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Description
+            </label>
             <textarea
               name="description"
               value={formData.description}
@@ -490,7 +505,9 @@ export default function ProductForm({
                   onChange={handleChange}
                   className="w-4 h-4 text-orange-500 rounded cursor-pointer"
                 />
-                <span className="text-sm font-medium text-gray-700">Show Per SqFt Price</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Show Per SqFt Price
+                </span>
               </label>
             </div>
 
@@ -520,7 +537,9 @@ export default function ProductForm({
 
           {/* Retail Pricing */}
           <div className="pb-4 border-b border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-800 mb-4">Retail Pricing</h3>
+            <h3 className="text-sm font-semibold text-gray-800 mb-4">
+              Retail Pricing
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -541,7 +560,9 @@ export default function ProductForm({
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Discount Price</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Discount Price
+                </label>
                 <div className="relative">
                   <span className="absolute left-3 top-2 text-gray-500">$</span>
                   <input
@@ -560,7 +581,9 @@ export default function ProductForm({
 
           {/* Enterprise Pricing */}
           <div className="pb-4 border-b border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-800 mb-4">Enterprise Pricing</h3>
+            <h3 className="text-sm font-semibold text-gray-800 mb-4">
+              Enterprise Pricing
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -581,7 +604,9 @@ export default function ProductForm({
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Discount Price</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Discount Price
+                </label>
                 <div className="relative">
                   <span className="absolute left-3 top-2 text-gray-500">$</span>
                   <input
@@ -616,7 +641,9 @@ export default function ProductForm({
           <SectionHeader number="4" title="Media & SEO" />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Product Images</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Product Images
+            </label>
             <textarea
               name="images"
               value={formData.images}
@@ -654,7 +681,21 @@ export default function ProductForm({
               onChange={handleChange}
               className="w-4 h-4 text-orange-500 rounded cursor-pointer"
             />
-            <span className="text-sm font-medium text-gray-700">Mark as Featured Product</span>
+            <span className="text-sm font-medium text-gray-700">
+              Mark as Featured Product
+            </span>
+          </label>
+          <label className="flex items-center gap-2 mt-2">
+            <input
+              type="checkbox"
+              name="isPopular"
+              checked={formData.isPopular}
+              onChange={handleChange}
+              className="w-4 h-4 text-orange-500 rounded cursor-pointer"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              Mark as Popular Product
+            </span>
           </label>
         </div>
 
@@ -665,7 +706,11 @@ export default function ProductForm({
             disabled={isSubmitting}
             className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-md font-semibold transition-colors disabled:opacity-50 text-sm"
           >
-            {isSubmitting ? "Saving..." : isEdit ? "Update Product" : "Create Product"}
+            {isSubmitting
+              ? "Saving..."
+              : isEdit
+              ? "Update Product"
+              : "Create Product"}
           </button>
           <button
             type="button"

@@ -58,6 +58,7 @@ const ProductSchema = new Schema(
     // 🏷️ Tags
     tags: [String],
     isFeatured: { type: Boolean, default: false },
+    isPopular: { type: Boolean, default: false },
 
     // -----------------------------------------------------
     // 🆕 NEW FIELDS REQUESTED

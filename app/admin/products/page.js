@@ -1,10 +1,10 @@
 // app/admin/products/page.js
 
 import Link from "next/link";
-import { getAllProducts } from "@/lib/fetchers/products";
-import { getAllCategories } from "@/lib/fetchers/categories";
+import { getAllProducts } from "@/lib/fetchers/serverProducts";
 import ProductsTable from "@/components/admin/ProductsTable";
 import { Plus } from "lucide-react";
+import { getAllCategories } from "@/lib/fetchers/serverCategories";
 
 export default async function ProductsPage() {
   const products = await getAllProducts();

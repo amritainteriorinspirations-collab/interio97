@@ -1,7 +1,7 @@
 // app/admin/page.js
 import Link from "next/link";
-import { getAllCategories } from "@/lib/fetchers/categories";
-import { getAllProducts } from "@/lib/fetchers/products";
+import { getAllCategories } from "@/lib/fetchers/serverCategories";
+import { getAllProducts } from "@/lib/fetchers/serverProducts";
 import { FolderOpen, Package, CheckCircle, XCircle, Plus, TrendingUp } from "lucide-react";
 
 export default async function AdminDashboard() {

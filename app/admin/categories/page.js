@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAllCategories } from "@/lib/fetchers/categories";
+import { getAllCategories } from "@/lib/fetchers/serverCategories";
 import CategoriesTable from "@/components/admin/CategoriesTable";
 import { Plus } from "lucide-react";
 

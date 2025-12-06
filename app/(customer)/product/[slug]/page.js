@@ -1,6 +1,6 @@
 // app/(customer)/product/[slug]/page.js
 
-import { getProductBySlug } from "@/lib/fetchers/products";
+import { getProductBySlug } from "@/lib/fetchers/serverProducts";
 import { getUserProfile } from "@/lib/api/api";
 import { notFound } from "next/navigation";
 import Breadcrumb from "@/components/customer/Breadcrumb";
