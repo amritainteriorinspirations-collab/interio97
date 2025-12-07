@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { deleteApplication, getAllApplications } from "@/lib/fetchers/applications";
+import { deleteApplication } from "@/lib/fetchers/applications";
 import { Plus, Edit, Trash2, EyeIcon } from "lucide-react";
 import { revalidatePath } from "next/cache";
+import { getAllApplicationsServer } from "@/lib/serversideFetchers/applications";
 
 /* -------------------- SERVER ACTION -------------------- */
 async function handleDelete(formData) {
@@ -13,7 +14,7 @@ async function handleDelete(formData) {
 
 /* -------------------- PAGE COMPONENT -------------------- */
 export default async function ApplicationsPage() {
-  const applications = await getAllApplications();
+  const applications = await getAllApplicationsServer();
 
   return (
     <div>

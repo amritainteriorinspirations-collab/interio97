@@ -1,9 +1,9 @@
 // ===== app/admin/applications/[id]/page.js =====
 import ApplicationForm from "@/components/admin/ApplicationForm";
-import { getApplicationById } from "@/lib/fetchers/applications";
+import { getApplicationByIdServer } from "@/lib/serversideFetchers/applications";
 
 export default async function EditApplicationPage({ params }) {
-  const application = await getApplicationById(params.id);
+  const application = await getApplicationByIdServer(params.id);
 
   return (
     <div>

@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { getAllPatternVariants, deletePatternVariant } from "@/lib/fetchers/patternVariants";
+import { deletePatternVariant } from "@/lib/fetchers/patternVariants";
 import { Plus } from "lucide-react";
 import { revalidatePath } from "next/cache";
+import { getAllPatternVariantsServer } from "@/lib/serversideFetchers/patternVariants";
 
 /* -------------------- SERVER ACTION -------------------- */
 async function handleDelete(formData) {
@@ -18,7 +19,7 @@ async function handleDelete(formData) {
 
 /* -------------------- PAGE COMPONENT -------------------- */
 export default async function PatternVariantsPage() {
-  const variants = await getAllPatternVariants();
+  const variants = await getAllPatternVariantsServer();
 
   return (
     <div>

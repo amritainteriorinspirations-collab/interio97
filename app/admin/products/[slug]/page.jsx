@@ -1,18 +1,18 @@
 import { getProductBySlug } from "@/lib/fetchers/serverProducts";
 import { getAllCategories } from "@/lib/fetchers/serverCategories";
-import { getAllColorVariants } from "@/lib/fetchers/colorVariants";
-import { getAllPatternVariants } from "@/lib/fetchers/patternVariants";
 import ProductForm from "@/components/admin/ProductForm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getAllApplications } from "@/lib/fetchers/applications";
+import { getAllApplicationsServer } from "@/lib/serversideFetchers/applications";
+import { getAllPatternVariantsServer } from "@/lib/serversideFetchers/patternVariants";
+import { getAllColorVariantsServer } from "@/lib/serversideFetchers/colorVariants";
 
 export default async function EditProductPage({ params }) {
   const data = await getProductBySlug(params.slug);
   const categories = await getAllCategories();
-  const colorVariants = await getAllColorVariants();
-  const patternVariants = await getAllPatternVariants();
-  const applications = await getAllApplications();
+  const colorVariants = await getAllColorVariantsServer();
+  const patternVariants = await getAllPatternVariantsServer();
+  const applications = await getAllApplicationsServer();
 
   if (!data) {
     notFound();

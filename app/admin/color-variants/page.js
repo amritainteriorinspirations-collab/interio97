@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { deleteColorVariant, getAllColorVariants } from "@/lib/fetchers/colorVariants";
+import { deleteColorVariant } from "@/lib/fetchers/colorVariants";
 import { Plus } from "lucide-react";
 import { revalidatePath } from "next/cache";
+import { getAllColorVariantsServer } from "@/lib/serversideFetchers/colorVariants";
 
 /* -------------------- SERVER ACTION -------------------- */
 async function handleDelete(formData) {
@@ -18,7 +19,7 @@ async function handleDelete(formData) {
 
 /* -------------------- PAGE COMPONENT -------------------- */
 export default async function ColorVariantsPage() {
-  const variants = await getAllColorVariants();
+  const variants = await getAllColorVariantsServer();
 
   return (
     <div>

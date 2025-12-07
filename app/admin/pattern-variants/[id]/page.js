@@ -1,8 +1,9 @@
-import { getPatternVariantById } from "@/lib/fetchers/patternVariants";
 import PatternVariantForm from "@/components/admin/PatternVariantForm";
+import { getPatternVariantByIdServer } from "@/lib/serversideFetchers/patternVariants";
+
 
 export default async function EditPatternVariantPage({ params }) {
-  const variant = await getPatternVariantById(params.id);
+  const variant = await getPatternVariantByIdServer(params.id);
 
   return (
     <div>

@@ -1,10 +1,10 @@
 
 // ===== app/admin/variants/color/[id]/page.js =====
 import VariantForm from "@/components/admin/VariantForm";
-import { getColorVariantById } from "@/lib/fetchers/colorVariants";
+import { getColorVariantByIdServer } from "@/lib/serversideFetchers/colorVariants";
 
 export default async function EditColorVariantPage({ params }) {
-  const variant = await getColorVariantById(params.id);
+  const variant = await getColorVariantByIdServer(params.id);
 
   return (
     <div>
