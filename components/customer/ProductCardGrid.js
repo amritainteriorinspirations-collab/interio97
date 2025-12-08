@@ -1,4 +1,5 @@
-import { Percent } from "lucide-react";
+// components/customer/ProductCardGrid.js
+
 import Link from "next/link";
 
 export default function ProductCardGrid({ product, userRole }) {
