@@ -1,7 +1,9 @@
 import CategoryCard from "@/components/customer/CategoryCard";
+import { getAllCategories } from "@/lib/fetchers/serverCategories";
 
-export default function PopularCategoriesSection({ categories }) {
+export default async function PopularCategoriesSection() {
   // Take only top 12 categories
+  const categories = await getAllCategories();
   const topCategories = categories.slice(0, 12);
 
   return (

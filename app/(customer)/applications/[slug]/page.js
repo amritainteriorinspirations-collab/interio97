@@ -1,9 +1,12 @@
 // app/(customer)/applications/[slug]/page.js
-import { getUserProfile } from "@/lib/api/api";
 import { notFound } from "next/navigation";
 import Breadcrumb from "@/components/customer/Breadcrumb";
 import CategoryPageClient from "@/components/customer/CategoryPageClient";
 import { getApplicationBySlug } from "@/lib/fetchers/applicationProducts";
+
+
+export const revalidate = 3600; // 1 hour
+
 
 export default async function ApplicationPage({ params }) {
   const data = await getApplicationBySlug(params.slug);

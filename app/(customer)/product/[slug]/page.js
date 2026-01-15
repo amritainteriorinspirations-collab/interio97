@@ -11,6 +11,9 @@ import {
 } from "@/lib/fetchers/relatedProducts";
 import RelatedProductsRow from "@/components/customer/RelatedProductsRow";
 
+export const revalidate = 1800; // 1 hour
+
+
 // app/(customer)/product/[slug]/page.js
 export default async function ProductPage({ params }) {
   const slug = await params.slug;

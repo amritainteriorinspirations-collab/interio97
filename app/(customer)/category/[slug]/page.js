@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import Breadcrumb from "@/components/customer/Breadcrumb";
 import CategoryPageClient from "@/components/customer/CategoryPageClient";
 
-export const revalidate = 600;
+export const revalidate = 1800;
 
 export default async function CategoryPage({ params }) {
   const data = await getCategoryBySlug(params.slug);
