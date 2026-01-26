@@ -62,15 +62,13 @@ export default function CheckoutPage() {
     try {
       setPlacingOrder(true);
 
-      console.log("doing..")
 
       const result = await createOrder({
         addressId: selectedAddressId,
         paymentMethod,
       });
 
-            console.log("doing..")
-
+      console.log("Order created:", result);
 
       // COD → order done
       if (paymentMethod === "COD") {

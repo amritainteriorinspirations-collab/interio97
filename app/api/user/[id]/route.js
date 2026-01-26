@@ -1,3 +1,5 @@
+// app/api/user/[id]/route.js
+
 import { verifyToken } from "@/lib/auth/token";
 import DbConnect from "@/lib/Db/DbConnect";
 import User from "@/models/user";

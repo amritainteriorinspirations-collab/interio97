@@ -1,5 +1,6 @@
 "use client";
 
+import { updateUserProfile } from "@/lib/actions/user";
 import { useEffect, useState } from "react";
 
 export default function ProfileSection() {
@@ -143,25 +144,37 @@ export default function ProfileSection() {
 
       {/* Actions */}
       {isEditing && (
-        <div className="flex gap-3 pt-4">
-          <button
-            disabled
-            className="bg-orange-500 text-white text-sm px-4 py-2 rounded opacity-50 cursor-not-allowed"
-          >
-            Save (API pending)
-          </button>
+  <div className="flex gap-3 pt-4">
+    <button
+      onClick={async () => {
+        try {
+          const updated = await updateUserProfile({
+            name: form.name,
+          });
 
-          <button
-            onClick={() => {
-              setIsEditing(false);
-              setForm({ name: user.name });
-            }}
-            className="text-sm px-4 py-2 rounded border"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
+          setUser(updated);
+          setIsEditing(false);
+        } catch (err) {
+          alert(err.message || "Failed to update profile");
+        }
+      }}
+      className="bg-orange-500 text-white text-sm px-4 py-2 rounded"
+    >
+      Save
+    </button>
+
+    <button
+      onClick={() => {
+        setIsEditing(false);
+        setForm({ name: user.name });
+      }}
+      className="text-sm px-4 py-2 rounded border"
+    >
+      Cancel
+    </button>
+  </div>
+)}
+
     </div>
   );
 }
