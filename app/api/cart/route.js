@@ -4,7 +4,7 @@ import { verifyToken } from "@/lib/auth/token";
 import DbConnect from "@/lib/Db/DbConnect";
 import Cart from "@/models/cart";
 import Product from "@/models/product";
-import { resolvePrice } from "@/lib/pricing/resolvePrice";
+import { resolveCartPricing } from "@/lib/pricing/cartPricing";
 
 export async function GET(req) {
   try {
@@ -32,55 +32,62 @@ export async function GET(req) {
 
     if (!cart || cart.items.length === 0) {
       return NextResponse.json({
-        cart: { items: [], subtotal: 0 },
+        cart: {
+          items: [],
+          totals: {
+            totalOriginalPrice: 0,
+            totalDiscount: 0,
+            deliveryCharge: 399,
+            grandTotal: 399,
+          },
+        },
       });
     }
 
-    const productIds = cart.items.map((i) => i.productId);
-
     const products = await Product.find({
-      _id: { $in: productIds },
+      _id: { $in: cart.items.map((i) => i.productId) },
     });
 
     const productMap = new Map(
       products.map((p) => [p._id.toString(), p])
     );
 
-    let subtotal = 0;
+    // 🔑 FULL product passed to pricing
+    const items = cart.items
+      .map((item) => {
+        const product = productMap.get(item.productId.toString());
+        if (!product) return null;
 
-    const items = cart.items.map((item) => {
-      const product = productMap.get(item.productId.toString());
+        return {
+          product,
+          quantity: item.quantity,
+        };
+      })
+      .filter(Boolean);
 
-      if (!product) {
-        return null;
-      }
+    const resolvedCart = resolveCartPricing({
+      items,
+      role: payload.user.role,
+    });
 
-      const pricing = resolvePrice({
-        product,
-        role: payload.user.role,
-        quantity: item.quantity,
-      });
-
-      subtotal += pricing.lineTotal;
-
-      return {
-        product: {
-          _id: product._id,
-          name: product.name,
-          slug: product.slug,
-          images: product.images,
-          stock: product.stock,
-        },
-        quantity: item.quantity,
-        sellBy: item.sellBy,
-        pricing,
-      };
-    }).filter(Boolean);
+    // 🔑 Trim product only for response
+    const sanitizedItems = resolvedCart.items.map((item) => ({
+      product: {
+        _id: item.product._id,
+        name: item.product.name,
+        slug: item.product.slug,
+        images: item.product.images,
+        stock: item.product.stock,
+        sellBy: item.product.sellBy,
+      },
+      quantity: item.quantity,
+      pricing: item.pricing,
+    }));
 
     return NextResponse.json({
       cart: {
-        items,
-        subtotal,
+        items: sanitizedItems,
+        totals: resolvedCart.totals,
       },
     });
   } catch (error) {

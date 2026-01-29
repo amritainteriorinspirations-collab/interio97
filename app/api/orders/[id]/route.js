@@ -1,3 +1,4 @@
+// app/api/orders/[id]/route.js
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth/token";
 import DbConnect from "@/lib/Db/DbConnect";
@@ -35,7 +36,8 @@ export async function GET(req, { params }) {
       );
     }
 
-    return NextResponse.json({ order });
+return NextResponse.json({ order });
+
   } catch (error) {
     console.error("Order fetch error:", error);
     return NextResponse.json(

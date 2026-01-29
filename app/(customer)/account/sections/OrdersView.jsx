@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccount } from "../AccountDataProvider";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 function StatusBadge({ status, type }) {
   const map = {
@@ -34,14 +34,8 @@ function StatusBadge({ status, type }) {
 }
 
 export default function OrdersView() {
-  const {
-    orders,
-    orderDetails,
-    loadOrderDetail,
-    loading,
-  } = useAccount();
-
-  const [expandedId, setExpandedId] = useState(null);
+  const { orders, loading } = useAccount();
+  const router = useRouter();
 
   if (loading.orders || !orders) {
     return (
@@ -59,111 +53,52 @@ export default function OrdersView() {
     );
   }
 
-  async function toggleOrder(orderId) {
-    if (expandedId === orderId) {
-      setExpandedId(null);
-      return;
-    }
-
-    setExpandedId(orderId);
-    await loadOrderDetail(orderId);
-  }
-
   return (
     <div className="space-y-4">
-      {orders.map((order) => {
-        const detail = orderDetails[order._id];
-
-        return (
-          <div
-            key={order._id}
-            className="bg-white border rounded"
-          >
-            {/* Summary */}
-            <button
-              onClick={() => toggleOrder(order._id)}
-              className="w-full text-left p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
-            >
-              <div>
-                <p className="text-sm font-medium">
-                  Order #{order.orderNumber}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {new Date(order.createdAt).toLocaleString()}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3 text-sm">
-                <span className="font-semibold">
-                  ₹{order.totals.grandTotal}
-                </span>
-
-                <StatusBadge
-                  type="order"
-                  status={order.orderStatus}
-                />
-                <StatusBadge
-                  type="payment"
-                  status={order.paymentStatus}
-                />
-              </div>
-            </button>
-
-            {/* Detail */}
-            {expandedId === order._id && (
-              <div className="border-t p-4 space-y-4">
-                {!detail ? (
-                  <p className="text-sm text-gray-500">
-                    Loading order details…
-                  </p>
-                ) : (
-                  <>
-                    {/* Items */}
-                    <div className="space-y-2">
-                      {detail.items.map((item) => (
-                        <div
-                          key={item.productId}
-                          className="flex justify-between text-sm"
-                        >
-                          <span>
-                            {item.productSnapshot.name} ×{" "}
-                            {item.quantity}
-                          </span>
-                          <span>
-                            ₹{item.pricingSnapshot.lineTotal}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Address */}
-                    <div className="border-t pt-3 text-sm">
-                      <p className="font-medium mb-1">
-                        Shipping Address
-                      </p>
-                      <p>{detail.addressSnapshot.name}</p>
-                      <p className="text-gray-600">
-                        {detail.addressSnapshot.addressLine1},{" "}
-                        {detail.addressSnapshot.city},{" "}
-                        {detail.addressSnapshot.state} –{" "}
-                        {detail.addressSnapshot.pincode}
-                      </p>
-                    </div>
-
-                    {/* Totals */}
-                    <div className="border-t pt-3 flex justify-between text-sm font-semibold">
-                      <span>Total</span>
-                      <span>
-                        ₹{detail.totals.grandTotal}
-                      </span>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
+      {orders.map((order) => (
+        <div
+          key={order._id}
+          className="bg-white border rounded p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+        >
+          {/* Left */}
+          <div>
+            <p className="text-sm font-medium">
+              Order #{order.orderNumber}
+            </p>
+            <p className="text-xs text-gray-500">
+              {new Date(order.createdAt).toLocaleString()}
+            </p>
           </div>
-        );
-      })}
+
+          {/* Middle */}
+          <div className="flex gap-2">
+            <StatusBadge
+              type="order"
+              status={order.orderStatus}
+            />
+            <StatusBadge
+              type="payment"
+              status={order.paymentStatus}
+            />
+          </div>
+
+          {/* Right */}
+          <div className="flex items-center gap-4">
+            <span className="font-semibold text-sm">
+              ₹{order.totals.grandTotal}
+            </span>
+
+            <button
+              onClick={() =>
+                router.push(`/order/${order._id}`)
+              }
+              className="text-sm text-orange-600 hover:underline"
+            >
+              View Details
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

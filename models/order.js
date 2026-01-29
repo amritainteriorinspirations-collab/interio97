@@ -30,11 +30,32 @@ const orderItemSchema = new mongoose.Schema(
     },
 
     pricingSnapshot: {
-      unitPrice: Number,
-      discountApplied: Number,
-      finalUnitPrice: Number,
-      lineTotal: Number,
+    unitOriginalPrice: {
+      type: Number,
+      required: true,
     },
+    unitFinalPrice: {
+      type: Number,
+      required: true,
+    },
+    discountPerUnit: {
+      type: Number,
+      required: true,
+    },
+    discountPercent: {
+      type: Number,
+      required: true,
+    },
+    lineOriginalTotal: {
+      type: Number,
+      required: true,
+    },
+    lineFinalTotal: {
+      type: Number,
+      required: true,
+    },
+  },
+
   },
   { _id: false }
 );
