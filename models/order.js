@@ -9,19 +9,14 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Snapshot of product at order time
     productSnapshot: {
-      name: String,
-      sku: String,
-      image: String,
+      name:     String,
+      sku:      String,
+      image:    String,
       category: [mongoose.Schema.Types.ObjectId],
     },
 
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
+    quantity: { type: Number, required: true, min: 1 },
 
     sellBy: {
       type: String,
@@ -29,47 +24,29 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
     },
 
+    // Mirrors the per-item pricing shape from cartPricing.js
     pricingSnapshot: {
-    unitOriginalPrice: {
-      type: Number,
-      required: true,
+      unitOriginalPrice: { type: Number, required: true }, // MRP per unit
+      unitFinalPrice:    { type: Number, required: true }, // after-discount per unit
+      discountPerUnit:   { type: Number, required: true }, // rupees saved per unit
+      discountPercent:   { type: Number, required: true }, // % off (0 if none)
+      lineOriginalTotal: { type: Number, required: true }, // unitOriginalPrice × qty
+      lineFinalTotal:    { type: Number, required: true }, // unitFinalPrice × qty
     },
-    unitFinalPrice: {
-      type: Number,
-      required: true,
-    },
-    discountPerUnit: {
-      type: Number,
-      required: true,
-    },
-    discountPercent: {
-      type: Number,
-      required: true,
-    },
-    lineOriginalTotal: {
-      type: Number,
-      required: true,
-    },
-    lineFinalTotal: {
-      type: Number,
-      required: true,
-    },
-  },
-
   },
   { _id: false }
 );
 
 const addressSnapshotSchema = new mongoose.Schema(
   {
-    name: String,
-    phone: String,
+    name:         String,
+    phone:        String,
     addressLine1: String,
     addressLine2: String,
-    city: String,
-    state: String,
-    pincode: String,
-    country: String,
+    city:         String,
+    state:        String,
+    pincode:      String,
+    country:      String,
   },
   { _id: false }
 );
@@ -89,26 +66,19 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
-    orderNumber: {
-      type: String,
-      unique: true,
-      index: true,
-    },
+    orderNumber: { type: String, unique: true, index: true },
 
-    items: {
-      type: [orderItemSchema],
-      required: true,
-    },
+    items: { type: [orderItemSchema], required: true },
 
-    addressSnapshot: {
-      type: addressSnapshotSchema,
-      required: true,
-    },
+    addressSnapshot: { type: addressSnapshotSchema, required: true },
 
+    // Canonical totals shape — mirrors cartPricing.js buildTotals()
     totals: {
-      subtotal: Number,
-      discount: Number,
-      grandTotal: Number,
+      mrp:            Number, // market price total before discounts
+      discount:       Number, // total rupees saved  (mrp - subtotal)
+      subtotal:       Number, // items total after discounts, before delivery
+      deliveryCharge: Number, // fixed ₹399
+      grandTotal:     Number, // subtotal + deliveryCharge
     },
 
     paymentMethod: {

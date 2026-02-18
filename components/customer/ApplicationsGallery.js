@@ -1,20 +1,20 @@
+// components/customer/ApplicationsGallery.js
 export default function ApplicationsGallery({ applications }) {
-  if (!applications || applications.length === 0) {
-    return null;
-  }
+  if (!applications || applications.length === 0) return null;
 
   return (
-    <div className="mb-3">
-      <h2 className="text-md sm:text-md font-bold text-gray-900 mb-4">
-        Applications
-      </h2>
+    <div>
+      {/* Divider from specs above */}
+      <div className="h-px bg-gray-200 mb-4" />
 
-      {/* Static Grid */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-4">
+      <h3 className="text-md font-bold text-gray-900 mb-3">Applications</h3>
+
+      {/* Tighter grid, smaller images */}
+      <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2 sm:gap-3">
         {applications.map((app, idx) => (
-          <div key={app._id || idx} className="flex flex-col items-center">
-            {/* Image Container - No BG, No Roundness */}
-            <div className="w-16 sm:w-18 aspect-square overflow-hidden mb-1.5">
+          <div key={app._id || idx} className="flex flex-col items-center gap-1">
+            {/* Image — smaller: w-12 (48px) from w-16 (64px) */}
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-md overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
               {app.image ? (
                 <img
                   src={app.image}
@@ -22,14 +22,11 @@ export default function ApplicationsGallery({ applications }) {
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                  <span className="text-2xl">🏠</span>
-                </div>
+                <span className="text-xl">🏠</span>
               )}
             </div>
-
-            {/* Application Name */}
-            <p className="text-xs font-medium text-gray-900 text-center line-clamp-2">
+            {/* Label */}
+            <p className="text-[10px] font-medium text-gray-700 text-center line-clamp-2 leading-tight">
               {app.name}
             </p>
           </div>

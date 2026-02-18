@@ -1,8 +1,9 @@
+// app/(customer)/account/sections/CartView.jsx
 "use client";
 
-import AccountLoader from "@/components/Loaders/AccountLoader";
 import { useAccount } from "../AccountDataProvider";
 import CartItemCard from "./cart/CartItemCard";
+import CartLoader from "./cart/CartLoader";
 import CartSummary from "./cart/CartSummary";
 import { ShoppingCart, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -11,17 +12,14 @@ export default function CartView() {
   const { cart, user, loading } = useAccount();
 
   if (loading.cart || !cart) {
-    return (
-            <AccountLoader />
-      
-    );
+    return <CartLoader />;  
   }
 
   if (cart.items.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-12 text-center border border-dashed border-gray-300">
+      <div className="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
         <ShoppingCart className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-        <h3 className="text-gray-900 font-semibold mb-1 text-lg">
+        <h3 className="text-gray-900 font-semibold mb-1 text-base">
           Your cart is empty
         </h3>
         <p className="text-gray-500 text-sm mb-6">
@@ -40,12 +38,17 @@ export default function CartView() {
 
   return (
     <div className="space-y-6">
-      {/* Cart Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Shopping Cart</h2>
-        <p className="text-sm text-gray-500 mt-1">
-          {cart.items.length} {cart.items.length === 1 ? "item" : "items"} in your cart
-        </p>
+      {/* Cart Header with Icon */}
+      <div className="flex items-start gap-3">
+        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100">
+          <ShoppingCart size={20} className="text-blue-600" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-gray-900">Shopping Cart</h2>
+          <p className="text-xs text-gray-500 mt-1">
+            {cart.items.length} {cart.items.length === 1 ? "item" : "items"} in your cart
+          </p>
+        </div>
       </div>
 
       {/* Main Grid */}

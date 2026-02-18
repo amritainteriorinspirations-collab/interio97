@@ -2,14 +2,14 @@ export default function AccountLoading() {
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Breadcrumb Skeleton */}
-      <div className="bg-white border-b px-4 sm:px-6 lg:px-8 py-3">
+      <div className="bg-white  px-4 sm:px-6 lg:px-8 py-3">
         <div className="max-w-6xl mx-auto">
           <div className="h-3 w-48 bg-gray-200 rounded animate-pulse" />
         </div>
       </div>
 
       {/* Compact Header with Icon Skeleton */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white shadow-sm ">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 animate-pulse">
           <div className="flex items-center gap-3">
             {/* Icon Badge */}
@@ -25,7 +25,7 @@ export default function AccountLoading() {
       </div>
 
       {/* Tab Navigation Skeleton */}
-      <div className="sticky top-0 bg-white shadow-sm z-20 border-b">
+      <div className="sticky top-0 bg-white shadow-sm z-20 ">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 animate-pulse">
           <div className="flex gap-0 overflow-x-auto">
             {[...Array(4)].map((_, i) => (

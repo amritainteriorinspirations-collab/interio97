@@ -59,9 +59,9 @@ export const LoginForm = () => {
       setMessage("Login successful! Redirecting...");
       setTimeout(() => {
         if (data.user.role === "admin") {
-          router.push("/admin/dashboard");
+          router.push("/account");
         } else if (data.user.role === "enterprise_active") {
-          router.push("/enterprise/dashboard");
+          router.push("/account");
         } else {
           router.push("/");
         }

@@ -18,7 +18,7 @@ export const SignupForm = () => {
     password: "",
     confirmPassword: "",
     businessName: "",
-    gstNo: "",
+    gstNumber: "",
     phone: "",
   });
 
@@ -50,8 +50,8 @@ export const SignupForm = () => {
     if (role === "enterprise") {
       if (!formData.businessName)
         newErrors.businessName = "Business name is required";
-      if (!formData.gstNo)
-        newErrors.gstNo = "GST number is required";
+      if (!formData.gstNumber)
+        newErrors.gstNumber = "GST number is required";
       if (!formData.phone) newErrors.phone = "Phone number is required";
       else if (!/^[0-9]{10}$/.test(formData.phone))
         newErrors.phone = "Enter a valid 10-digit phone number";
@@ -79,7 +79,7 @@ const handleSubmit = async (e) => {
         password: formData.password,
         ...(role === "enterprise" && {
           businessName: formData.businessName,
-          gstNo: formData.gstNo,
+          gstNumber: formData.gstNumber,
           phone: formData.phone,
         }),
       }),
@@ -198,11 +198,11 @@ const handleSubmit = async (e) => {
             <FormInput
               label="GST Number"
               type="text"
-              value={formData.gstNo}
+              value={formData.gstNumber}
               onChange={(e) =>
-                setFormData({ ...formData, gstNo: e.target.value })
+                setFormData({ ...formData, gstNumber: e.target.value })
               }
-              error={errors.gstNo}
+              error={errors.gstNumber}
             />
             <FormInput
               label="Phone Number"

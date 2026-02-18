@@ -1,16 +1,19 @@
 "use client";
 
-import { CreditCard, DollarSign } from "lucide-react";
+import { CreditCard, Banknote } from "lucide-react";
 
 export default function PaymentSelector({ value, onChange }) {
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-50 to-green-100 px-6 py-4 border-b border-green-200">
-        <h2 className="text-lg font-bold text-gray-900">Payment Method</h2>
-        <p className="text-sm text-gray-600 mt-1">
-          Choose how you'd like to pay for your order
-        </p>
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100">
+        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-200">
+          <CreditCard size={20} className="text-blue-600" />
+        </div>
+        <div>
+          <h2 className="font-bold text-gray-900">Payment Method</h2>
+          <p className="text-xs text-blue-700 mt-0.5">Choose how to pay</p>
+        </div>
       </div>
 
       {/* Payment Options */}
@@ -19,27 +22,26 @@ export default function PaymentSelector({ value, onChange }) {
         <label className={`block border-2 rounded-lg p-4 cursor-pointer transition-all ${
           value === "COD"
             ? "border-orange-500 bg-orange-50"
-            : "border-gray-200 hover:border-orange-300 hover:bg-gray-50"
+            : "border-gray-200 hover:border-orange-300 bg-white"
         }`}>
-          <div className="flex gap-4">
+          <div className="flex items-start gap-3">
             <input
               type="radio"
+              name="payment"
+              value="COD"
               checked={value === "COD"}
-              onChange={() => onChange("COD")}
-              className="mt-1 cursor-pointer"
+              onChange={(e) => onChange(e.target.value)}
+              className="mt-1 flex-shrink-0"
             />
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <DollarSign size={20} className="text-green-600" />
-                <p className="font-semibold text-gray-900">
+                <Banknote size={18} className="text-gray-600" />
+                <p className="text-sm font-semibold text-gray-900">
                   Cash on Delivery
                 </p>
               </div>
-              <p className="text-sm text-gray-600">
-                Pay when your order arrives at your doorstep
-              </p>
-              <p className="text-xs text-green-600 font-medium mt-2">
-                ✓ No extra charges
+              <p className="text-xs text-gray-500">
+                Pay when your order arrives
               </p>
             </div>
           </div>
@@ -49,27 +51,26 @@ export default function PaymentSelector({ value, onChange }) {
         <label className={`block border-2 rounded-lg p-4 cursor-pointer transition-all ${
           value === "PREPAID"
             ? "border-orange-500 bg-orange-50"
-            : "border-gray-200 hover:border-orange-300 hover:bg-gray-50"
+            : "border-gray-200 hover:border-orange-300 bg-white"
         }`}>
-          <div className="flex gap-4">
+          <div className="flex items-start gap-3">
             <input
               type="radio"
+              name="payment"
+              value="PREPAID"
               checked={value === "PREPAID"}
-              onChange={() => onChange("PREPAID")}
-              className="mt-1 cursor-pointer"
+              onChange={(e) => onChange(e.target.value)}
+              className="mt-1 flex-shrink-0"
             />
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <CreditCard size={20} className="text-blue-600" />
-                <p className="font-semibold text-gray-900">
+                <CreditCard size={18} className="text-gray-600" />
+                <p className="text-sm font-semibold text-gray-900">
                   Online Payment
                 </p>
               </div>
-              <p className="text-sm text-gray-600">
-                Pay securely using Razorpay (Cards, UPI, Wallets)
-              </p>
-              <p className="text-xs text-gray-500 font-medium mt-2">
-                💳 Debit/Credit Card, UPI, Wallets supported
+              <p className="text-xs text-gray-500">
+                Pay securely using Razorpay
               </p>
             </div>
           </div>
@@ -77,9 +78,9 @@ export default function PaymentSelector({ value, onChange }) {
       </div>
 
       {/* Info Box */}
-      <div className="bg-blue-50 border-t border-blue-200 px-6 py-4">
+      <div className="border-t border-gray-200 px-6 py-4 bg-blue-50">
         <p className="text-xs text-blue-700">
-          <span className="font-semibold">ℹ️ Security:</span> All payments are secure and encrypted. Your payment information is never shared.
+          💡 <span className="font-medium">Tip:</span> Cash on Delivery is available for most areas
         </p>
       </div>
     </div>

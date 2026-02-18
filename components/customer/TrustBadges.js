@@ -1,37 +1,27 @@
+// components/customer/TrustBadges.js
 import { Wrench, Shield, Truck } from "lucide-react";
 
-export default function TrustBadges() {
-  const badges = [
-    {
-      icon: Wrench,
-      label: "Installation Services Available",
-    },
-    {
-      icon: Shield,
-      label: "Amrita Interior Design Assured",
-    },
-    {
-      icon: Truck,
-      label: "Doorstep Delivery",
-    },
-  ];
+const badges = [
+  { icon: Wrench, label: "Installation Services" },
+  { icon: Shield, label: "Amrita Assured Quality" },
+  { icon: Truck,  label: "Doorstep Delivery"      },
+];
 
+export default function TrustBadges() {
   return (
-    <div className="bg-gray-50 rounded-md border border-gray-200 p-3 sm:p-4">
-      <div className="grid grid-cols-3 gap-3 sm:gap-4">
-        {badges.map((badge, idx) => {
-          const Icon = badge.icon;
-          return (
-            <div key={idx} className="flex flex-col items-center text-center">
-              <div className="bg-orange-700/90 text-white rounded-full p-2.5 mb-2">
-                <Icon className="w-5 h-5" />
-              </div>
-              <p className="text-[12px] sm:text-sm font-medium text-gray-900">
-                {badge.label}
-              </p>
+    <div className="bg-orange-50 rounded-sm border border-orange-100 px-3 py-3.5 sm:px-4 sm:py-4 mt-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        {badges.map(({ icon: Icon, label }, idx) => (
+          <div key={idx} className="flex flex-col items-center text-center gap-1.5">
+            {/* Icon circle — orange-500 consistent with rest of page */}
+            <div className="bg-orange-500 text-white rounded-full p-2 sm:p-2.5 flex-shrink-0">
+              <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-          );
-        })}
+            <p className="text-[11px] sm:text-xs font-medium text-gray-800 leading-tight">
+              {label}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );

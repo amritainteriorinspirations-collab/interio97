@@ -133,7 +133,7 @@ export default function OrdersView() {
           You haven't placed any orders yet. Start shopping to see your orders here!
         </p>
         <button
-          onClick={() => router.push("/products")}
+          onClick={() => router.push("/category/all")}
           className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
         >
           <ShoppingBag size={16} />
@@ -255,13 +255,7 @@ export default function OrdersView() {
                       ₹{order.totals.grandTotal.toLocaleString("en-IN")}
                     </p>
                   </div>
-                  <button
-                    onClick={() => router.push(`/orders/${order._id}`)}
-                    className="flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium transition-colors p-1"
-                  >
-                    <span className="text-sm">View</span>
-                    <ChevronRight size={18} />
-                  </button>
+                  
                 </div>
               </div>
             </div>

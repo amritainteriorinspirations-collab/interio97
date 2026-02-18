@@ -15,8 +15,8 @@ import {
   X,
   Check,
   AlertCircle,
+  Phone,
 } from "lucide-react";
-import AccountLoader from "@/components/Loaders/AccountLoader";
 
 const EMPTY_FORM = {
   name: "",
@@ -29,6 +29,38 @@ const EMPTY_FORM = {
   isDefault: false,
 };
 
+// Skeleton Loader
+function AddressSkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[...Array(2)].map((_, i) => (
+          <div
+            key={i}
+            className="bg-white rounded-lg border border-gray-200 p-5 space-y-3"
+          >
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <div className="h-5 w-32 bg-gray-200 rounded mb-2" />
+                <div className="h-3 w-20 bg-gray-100 rounded" />
+              </div>
+              <div className="flex gap-2">
+                <div className="h-9 w-9 bg-gray-200 rounded-lg" />
+                <div className="h-9 w-9 bg-gray-200 rounded-lg" />
+              </div>
+            </div>
+            <div className="space-y-2 pt-3 border-t border-gray-100">
+              <div className="h-3 w-full bg-gray-100 rounded" />
+              <div className="h-3 w-3/4 bg-gray-100 rounded" />
+              <div className="h-3 w-1/2 bg-gray-100 rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function AddressView() {
   const { addresses, setAddresses, loading } = useAccount();
 
@@ -39,10 +71,7 @@ export default function AddressView() {
   const [error, setError] = useState(null);
 
   if (loading.addresses || !addresses) {
-    return (
-            <AccountLoader />
-      
-    );
+    return <AddressSkeleton />;
   }
 
   function openAdd() {
@@ -107,28 +136,35 @@ export default function AddressView() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Saved Addresses</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Manage delivery addresses for your orders
-          </p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-green-100">
+            <MapPin size={20} className="text-green-600" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">Saved Addresses</h2>
+            <p className="text-xs text-gray-500 mt-1">
+              Manage delivery locations
+            </p>
+          </div>
         </div>
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex-shrink-0"
         >
           <Plus size={18} />
-          Add Address
+          Add
         </button>
       </div>
 
       {/* Empty State */}
       {addresses.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center border border-dashed border-gray-300">
+        <div className="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
           <MapPin className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-          <h3 className="text-gray-900 font-semibold mb-1">No addresses yet</h3>
-          <p className="text-gray-500 text-sm mb-4">
+          <h3 className="text-gray-900 font-semibold text-base mb-1">
+            No addresses yet
+          </h3>
+          <p className="text-gray-500 text-sm mb-6">
             Add your first address to get started with orders
           </p>
           <button
@@ -144,25 +180,25 @@ export default function AddressView() {
           {addresses.map((addr) => (
             <div
               key={addr._id}
-              className={`border-2 rounded-lg p-5 bg-white transition-all hover:shadow-md ${
+              className={`rounded-lg border-2 p-5 bg-white transition-all ${
                 addr.isDefault
                   ? "border-orange-500 bg-orange-50"
                   : "border-gray-200 hover:border-orange-300"
               }`}
             >
-              {/* Address Header */}
+              {/* Header */}
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-orange-100">
-                      <MapPin size={20} className="text-orange-600" />
-                    </div>
+                  <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-orange-100 flex-shrink-0">
+                    <MapPin size={18} className="text-orange-600" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{addr.name}</p>
+                    <p className="font-semibold text-gray-900 text-sm">
+                      {addr.name}
+                    </p>
                     {addr.isDefault && (
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-orange-600 bg-orange-100 px-2.5 py-0.5 rounded-full mt-1">
-                        <Check size={12} />
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full mt-1.5">
+                        <Check size={11} />
                         Default
                       </span>
                     )}
@@ -170,39 +206,37 @@ export default function AddressView() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-2">
+                <div className="flex gap-1 flex-shrink-0">
                   <button
                     onClick={() => openEdit(addr)}
                     className="p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
                     title="Edit"
                   >
-                    <Edit2 size={18} />
+                    <Edit2 size={16} />
                   </button>
                   <button
                     onClick={() => handleDelete(addr._id)}
                     className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title="Delete"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>
 
-              {/* Address Details */}
-              <div className="space-y-2 text-sm">
-                <p className="text-gray-700">
-                  <span className="font-medium">{addr.addressLine1}</span>
-                </p>
+              {/* Details */}
+              <div className="space-y-2 text-sm border-t border-gray-100 pt-4">
+                <p className="text-gray-700 font-medium">{addr.addressLine1}</p>
                 {addr.addressLine2 && (
                   <p className="text-gray-600">{addr.addressLine2}</p>
                 )}
                 <p className="text-gray-600">
                   {addr.city}, {addr.state} – {addr.pincode}
                 </p>
-                <p className="text-gray-600 flex items-center gap-2">
-                  <span>📞</span>
+                <div className="flex items-center gap-2 text-gray-600 pt-1">
+                  <Phone size={14} className="text-gray-400" />
                   {addr.phone}
-                </p>
+                </div>
               </div>
             </div>
           ))}
@@ -215,14 +249,14 @@ export default function AddressView() {
           <div className="bg-white rounded-lg w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white">
-              <h3 className="text-xl font-bold text-gray-900">
+              <h3 className="text-lg font-bold text-gray-900">
                 {editing ? "Edit Address" : "Add New Address"}
               </h3>
               <button
                 onClick={() => setShowForm(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
               >
-                <X size={24} />
+                <X size={20} />
               </button>
             </div>
 
