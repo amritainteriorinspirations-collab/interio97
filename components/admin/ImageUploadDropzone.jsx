@@ -5,7 +5,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadCloud, Loader, X } from "lucide-react";
 
-export default function ImageUploadDropzone({ value, onChange }) {
+export default function ImageUploadDropzone({ value, onChange, folder = "uploads" }) {
   // ✅ Sync with parent value (important for edit mode)
   const [preview, setPreview] = useState(value || "");
   const [uploading, setUploading] = useState(false);
@@ -35,7 +35,7 @@ export default function ImageUploadDropzone({ value, onChange }) {
 
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("folder", "categories");
+      formData.append("folder", folder);
       setUploading(true);
 
       try {

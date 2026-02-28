@@ -210,11 +210,9 @@ export default function CategoryForm({ category = null }) {
             <ImageUploadDropzone
               value={formData.image}
               onChange={(url) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  image: url,
-                }))
+                setFormData((prev) => ({ ...prev, image: url }))
               }
+              folder="categories" // ✅ explicit
             />
 
             <p className="text-xs text-gray-500 mt-1">

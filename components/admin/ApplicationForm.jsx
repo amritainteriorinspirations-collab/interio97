@@ -1,9 +1,14 @@
+// compoennts/admin/ApplicationForm.jsx
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createApplication, updateApplication } from "@/lib/fetchers/applications";
-import { Save, X, Loader, Image as ImageIcon } from "lucide-react";
+import {
+  createApplication,
+  updateApplication,
+} from "@/lib/fetchers/applications";
+import { Save, X, Loader } from "lucide-react";
+import ImageUploadDropzone from "./ImageUploadDropzone";
 
 // Input Field Component
 const InputField = ({
@@ -127,34 +132,17 @@ export default function ApplicationForm({ application = null }) {
 
         {/* Image URL */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-2">
-            <ImageIcon className="w-4 h-4" />
-            Image URL
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            Application Image
           </label>
-          <input
-            type="url"
-            name="image"
+          <ImageUploadDropzone
             value={form.image}
-            onChange={handleChange}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors"
-            placeholder="https://example.com/kitchen.jpg"
+            onChange={(url) => setForm((prev) => ({ ...prev, image: url }))}
+            folder="applications"
           />
-          <p className="text-xs text-gray-500 mt-1">Optional - application image for listings</p>
-
-          {/* Image Preview */}
-          {form.image && (
-            <div className="mt-4">
-              <p className="text-xs font-medium text-gray-600 mb-2">Preview:</p>
-              <img
-                src={form.image}
-                alt="Application preview"
-                className="w-full h-40 object-contain rounded-lg border border-gray-200"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                }}
-              />
-            </div>
-          )}
+          <p className="text-xs text-gray-500 mt-1">
+            Optional — image shown in application listings
+          </p>
         </div>
 
         {/* Description */}
