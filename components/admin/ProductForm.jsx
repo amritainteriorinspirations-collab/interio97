@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createProduct, updateProduct } from "@/lib/fetchers/products";
+import MultiImageUpload from "./MultiImageUpload";
 
 // Section Header Component
 const SectionHeader = ({ number, title }) => (
@@ -152,11 +153,11 @@ export default function ProductForm({
     category: Array.isArray(product?.category)
       ? product.category.map((c) => c._id || c)
       : product?.category?._id
-      ? [product.category._id]
-      : [],
+        ? [product.category._id]
+        : [],
     description: product?.description || "",
     brand: product?.brand || "",
-    images: product?.images?.join(", ") || "",
+    images: product?.images || [],
     retailPrice: product?.retailPrice || "",
     retailDiscountPrice: product?.retailDiscountPrice || "",
     enterprisePrice: product?.enterprisePrice || "",
@@ -217,10 +218,7 @@ export default function ProductForm({
     try {
       const payload = {
         ...formData,
-        images: formData.images
-          .split(",")
-          .map((url) => url.trim())
-          .filter(Boolean),
+        images: formData.images,
         tags: formData.tags
           .split(",")
           .map((tag) => tag.trim())
@@ -644,15 +642,12 @@ export default function ProductForm({
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Product Images
             </label>
-            <textarea
-              name="images"
-              value={formData.images}
-              onChange={handleChange}
-              rows={2}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 text-sm resize-none"
-              placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+            <MultiImageUpload
+              values={formData.images}
+              onChange={(urls) =>
+                setFormData((prev) => ({ ...prev, images: urls }))
+              }
             />
-            <p className="text-xs text-gray-500 mt-1">Comma-separated URLs</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -709,8 +704,8 @@ export default function ProductForm({
             {isSubmitting
               ? "Saving..."
               : isEdit
-              ? "Update Product"
-              : "Create Product"}
+                ? "Update Product"
+                : "Create Product"}
           </button>
           <button
             type="button"
