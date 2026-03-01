@@ -40,21 +40,20 @@ export default function CheckoutPage() {
           router.push("/login");
           return;
         }
-        
+
         if (!cartRes.ok || !addrRes.ok) {
           throw new Error("Failed to load checkout data");
         }
-        
+
         const cartData = await cartRes.json();
         const addrData = await addrRes.json();
-        
+
         console.log("Cart Data:", cartRes);
         console.log("Address Data:", addrRes);
         // Validate cart is not empty
         if (!cartData.cart || cartData.cart.items.length === 0) {
           throw new Error("Your cart is empty");
         }
-
 
         setCart(cartData.cart);
         setAddresses(addrData.addresses || []);
@@ -92,10 +91,13 @@ export default function CheckoutPage() {
         paymentMethod,
       });
 
-      // Redirect to confirmation page
-      router.push(
-        `/checkout/confirmation?orderId=${result.orderId}&orderNumber=${result.orderNumber}`
-      );
+      if (result.paymentMethod === "PREPAID") {
+        router.push(`/pay/${result.orderId}`);
+      } else {
+        router.push(
+          `/checkout/confirmation?orderId=${result.orderId}&orderNumber=${result.orderNumber}`,
+        );
+      }
     } catch (err) {
       setError(err.message || "Failed to place order");
       setPlacingOrder(false);
@@ -104,9 +106,7 @@ export default function CheckoutPage() {
 
   // Loading State
   if (loading) {
-    return (
-      <AccountLoader />
-    );
+    return <AccountLoader />;
   }
 
   // Empty Cart Error
@@ -145,7 +145,8 @@ export default function CheckoutPage() {
           <div>
             <h1 className="text-lg font-bold text-gray-900">Checkout</h1>
             <p className="text-xs text-gray-500 mt-0.5">
-              Step {step} of 2: {step === 1 ? "Shipping & Payment" : "Review Order"}
+              Step {step} of 2:{" "}
+              {step === 1 ? "Shipping & Payment" : "Review Order"}
             </p>
           </div>
         </div>
@@ -155,7 +156,10 @@ export default function CheckoutPage() {
       {error && (
         <div className="max-w-6xl mx-auto px-4 mb-6">
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-            <AlertCircle size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
+            <AlertCircle
+              size={18}
+              className="text-red-600 flex-shrink-0 mt-0.5"
+            />
             <div>
               <p className="font-semibold text-red-800 text-sm">Error</p>
               <p className="text-red-700 text-sm">{error}</p>
@@ -177,7 +181,10 @@ export default function CheckoutPage() {
                 onAddNew={() => setShowAddressModal(true)}
               />
 
-              <PaymentSelector value={paymentMethod} onChange={setPaymentMethod} />
+              <PaymentSelector
+                value={paymentMethod}
+                onChange={setPaymentMethod}
+              />
 
               {/* Continue Button */}
               <button
@@ -225,7 +232,11 @@ export default function CheckoutPage() {
 
         {/* Right: Order Summary */}
         <div className="lg:sticky lg:top-24 lg:h-fit">
-          <OrderCheckoutSummary onPlaceOrder={handlePlaceOrder} placingOrder={placingOrder} cart={cart} />
+          <OrderCheckoutSummary
+            onPlaceOrder={handlePlaceOrder}
+            placingOrder={placingOrder}
+            cart={cart}
+          />
         </div>
       </div>
 
@@ -243,4 +254,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-

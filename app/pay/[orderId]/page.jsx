@@ -32,7 +32,7 @@ export default function PayPage() {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
           amount,
           currency,
-          name: "Your Store Name",
+          name: "interio97",
           description: `Order #${orderNumber}`,
           order_id: razorpayOrderId,
 
