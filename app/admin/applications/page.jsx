@@ -1,16 +1,15 @@
 // app/admin/applications/page.jsx
 
 import Link from "next/link";
-import { deleteApplication } from "@/lib/fetchers/applications";
 import { Plus, Edit, Trash2, EyeIcon } from "lucide-react";
 import { revalidatePath } from "next/cache";
-import { getAllApplicationsServer } from "@/lib/serversideFetchers/applications";
+import { deleteApplicationByIdServer, deleteApplicationByIdServer, getAllApplicationsServer } from "@/lib/serversideFetchers/applications";
 
 /* -------------------- SERVER ACTION -------------------- */
 async function handleDelete(formData) {
   "use server";
   const id = formData.get("id");
-  await deleteApplication(id);
+  await deleteApplicationByIdServer(id);
   revalidatePath("/admin/applications");
 }
 

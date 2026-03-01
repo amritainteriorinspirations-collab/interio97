@@ -1,7 +1,9 @@
+// components/admin/SlideCard.jsx
 "use client";
 
 import { useState } from "react";
 import { Trash2, Edit2, Check } from "lucide-react";
+import ImageUploadDropzone from "./ImageUploadDropzone";
 
 export default function SlideCard({ slide, index, onUpdate, onRemove }) {
   const [editing, setEditing] = useState(false);
@@ -11,7 +13,7 @@ export default function SlideCard({ slide, index, onUpdate, onRemove }) {
 
   const save = async () => {
     if (!url.trim()) {
-      alert("Image URL required.");
+      alert("Image required.");
       return;
     }
     setSaving(true);
@@ -27,9 +29,15 @@ export default function SlideCard({ slide, index, onUpdate, onRemove }) {
     }
   };
 
+  const handleCancel = () => {
+    setEditing(false);
+    setUrl(slide?.url || "");
+    setCaption(slide?.caption || "");
+  };
+
   return (
     <div className="border border-gray-300 rounded bg-white overflow-hidden shadow-sm hover:shadow-md hover:border-gray-400 transition-all duration-150">
-      {/* Preview */}
+      {/* Preview — unchanged */}
       <div className="h-32 bg-gray-100 overflow-hidden flex items-center justify-center">
         {slide?.url ? (
           <img
@@ -46,36 +54,32 @@ export default function SlideCard({ slide, index, onUpdate, onRemove }) {
       <div className="p-2 text-xs">
         {editing ? (
           <>
-            <input
+            {/* ✅ Dropzone instead of URL input */}
+            <ImageUploadDropzone
               value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Image URL"
-              className="w-full border rounded px-2 py-1 mb-1 text-xs"
+              onChange={setUrl}
+              folder="carousel"
             />
 
             <input
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
-              placeholder="Caption"
-              className="w-full border rounded px-2 py-1 mb-2 text-xs"
+              placeholder="Caption (optional)"
+              className="w-full border rounded px-2 py-1 mt-2 mb-2 text-xs"
             />
 
             <div className="flex items-center justify-between mt-1">
               <button
                 onClick={save}
-                disabled={saving}
-                className="px-2 py-1 bg-green-500 text-white rounded-sm flex items-center gap-1 text-xs"
+                disabled={saving || !url}
+                className="px-2 py-1 bg-green-500 text-white rounded-sm flex items-center gap-1 text-xs disabled:opacity-50"
               >
                 <Check className="w-3 h-3" />
                 {saving ? "..." : "Save"}
               </button>
 
               <button
-                onClick={() => {
-                  setEditing(false);
-                  setUrl(slide?.url || "");
-                  setCaption(slide?.caption || "");
-                }}
+                onClick={handleCancel}
                 className="px-2 py-1 bg-gray-100 rounded-sm text-xs"
               >
                 Cancel
@@ -93,6 +97,7 @@ export default function SlideCard({ slide, index, onUpdate, onRemove }) {
             </div>
           </>
         ) : (
+          // Non-editing view — completely unchanged
           <>
             <p className="font-medium text-gray-800 min-h-[1.5rem]">
               {slide?.caption || (

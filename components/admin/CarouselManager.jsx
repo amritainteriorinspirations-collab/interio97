@@ -1,3 +1,4 @@
+// camponents/admin/CarouselManager.jsx
 "use client";
 
 import { useState } from "react";
