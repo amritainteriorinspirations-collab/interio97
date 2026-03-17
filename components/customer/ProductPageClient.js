@@ -213,7 +213,7 @@ export default function ProductPageClient({ product, variants, colorVariants, pa
           )}
 
           {/* Cart button */}
-          <CartButton productId={product._id.toString()} stock={product.stock} />
+          <CartButton productId={product._id.toString()} stock={product.stock} userRole={userRole} />
 
           {/* Contact buttons */}
           <div className="grid grid-cols-12 gap-1.5">

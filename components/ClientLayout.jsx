@@ -1,12 +1,14 @@
 // components/ClientLayout.jsx
+// FIX: No longer accepts or forwards a `user` prop.
+// Header reads auth state directly from useAuth() now.
 import Footer from "./Footer";
 import Header from "./Header";
 
-export default function ClientLayout({ user, children }) {
+export default function ClientLayout({ children }) {
   return (
     <div className="relative min-h-screen flex flex-col">
-      <Header user={user} />
-      <main className="mt-16 py-6 px-2.5 flex-1">
+      <Header />
+      <main className="mt-16 flex-1">
         {children}
       </main>
       <Footer />

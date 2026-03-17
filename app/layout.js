@@ -2,7 +2,6 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "@/components/ClientLayout";
-import { getUserProfile } from "@/lib/api/api";
 import { AuthProvider } from "./providers/AuthProvider";
 import { Toaster } from "sonner";
 
@@ -16,16 +15,18 @@ export const metadata = {
   description: "The Best Interior Design Market Place",
 };
 
-
-export default async function RootLayout({ children }) {
-  const user = await getUserProfile();
+export default function RootLayout({ children }) {
+  // FIX: Removed getUserProfile() server call.
+  // Auth state is now fully managed client-side via AuthProvider + useAuth.
+  // This eliminates the production crash caused by server-side cookie/auth
+  // errors bubbling up through the entire page tree.
   return (
     <html lang="en">
-      <body className={`font-[Poppins] relative min-h-screen flex flex-col `}>
+      <body className={`${poppins.className} relative min-h-screen flex flex-col`}>
         <AuthProvider>
-        <ClientLayout user={user}>{children}</ClientLayout>
+          <ClientLayout>{children}</ClientLayout>
+          <Toaster richColors position="top-center" />
         </AuthProvider>
-        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

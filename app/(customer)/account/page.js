@@ -1,3 +1,4 @@
+// account/page.js
 import AccountDataProvider from "./AccountDataProvider";
 import Breadcrumb from "@/components/customer/Breadcrumb";
 import AccountShell from "./AccountShell";

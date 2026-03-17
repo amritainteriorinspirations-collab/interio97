@@ -1,37 +1,41 @@
 // components/customer/CartButton.jsx
+// FIX: Now checks useAuth() before calling the server action.
+// Unauthenticated users get an immediate toast with a Login button —
+// no server round-trip needed, no production crash possible.
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { ShoppingCart, Minus, Plus, Check, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useAuth } from "@/app/providers/AuthProvider";
 import { addToCart, updateCartItem, removeFromCart } from "@/lib/actions/cart";
 
 export default function CartButton({ productId, stock }) {
-  const router = useRouter();
+  const router       = useRouter();
+  const { user, loading: authLoading } = useAuth();
 
   const [state,   setState]   = useState("checking");
   const [qty,     setQty]     = useState(0);
   const [qtyBump, setQtyBump] = useState(false);
 
-  // ── On mount: check if already in cart ──────────────────────────────────
+  // ── On mount: check if already in cart (only if logged in) ──────────────
   useEffect(() => {
+    // Wait for auth to resolve before checking cart
+    if (authLoading) return;
+
+    // Not logged in → go straight to idle, no fetch needed
+    if (!user) {
+      setState("idle");
+      return;
+    }
+
     let cancelled = false;
 
     async function checkCart() {
       try {
         const res = await fetch("/api/cart");
-
-        // 401 → not logged in → show idle (not an error)
-        if (res.status === 401) {
-          if (!cancelled) setState("idle");
-          return;
-        }
-
-        if (!res.ok) {
-          if (!cancelled) setState("idle");
-          return;
-        }
+        if (!res.ok) { if (!cancelled) setState("idle"); return; }
 
         const { cart } = await res.json();
         const existing = cart?.items?.find(
@@ -49,7 +53,7 @@ export default function CartButton({ productId, stock }) {
 
     checkCart();
     return () => { cancelled = true; };
-  }, [productId]);
+  }, [productId, user, authLoading]);
 
   const triggerBump = useCallback(() => {
     setQtyBump(true);
@@ -59,36 +63,28 @@ export default function CartButton({ productId, stock }) {
   // ── Add to cart ──────────────────────────────────────────────────────────
   async function handleAdd() {
     if (state !== "idle") return;
-    setState("adding");
 
+    // FIX: Gate on auth state from context — instant, no server round-trip
+    if (!user) {
+      toast.error("Please log in to add items to your cart", {
+        description: "You need an account to save items.",
+        action: {
+          label: "Log in",
+          onClick: () => router.push("/login"),
+        },
+        duration: 5000,
+      });
+      return;
+    }
+
+    setState("adding");
     try {
       await addToCart(productId, 1);
       setState("added");
       setQty(1);
       setTimeout(() => setState("stepper"), 900);
     } catch (err) {
-      const msg = err.message || "Failed to add to cart";
-
-      // Detect auth errors and show a friendly toast with a login action
-      const isAuthError =
-        msg.toLowerCase().includes("not authenticated") ||
-        msg.toLowerCase().includes("unauthorized") ||
-        msg.toLowerCase().includes("login") ||
-        msg.toLowerCase().includes("sign in");
-
-      if (isAuthError) {
-        toast.error("Please log in to add items to your cart", {
-          description: "You need an account to save items.",
-          action: {
-            label: "Log in",
-            onClick: () => router.push("/login"),
-          },
-          duration: 5000,
-        });
-      } else {
-        toast.error(msg);
-      }
-
+      toast.error(err.message || "Failed to add to cart");
       setState("idle");
     }
   }
@@ -139,8 +135,8 @@ export default function CartButton({ productId, stock }) {
     }
   }
 
-  // ── Checking skeleton ────────────────────────────────────────────────────
-  if (state === "checking") {
+  // ── Skeleton while auth or cart is loading ───────────────────────────────
+  if (authLoading || state === "checking") {
     return <div className="w-full h-[42px] bg-gray-100 rounded-lg animate-pulse" />;
   }
 

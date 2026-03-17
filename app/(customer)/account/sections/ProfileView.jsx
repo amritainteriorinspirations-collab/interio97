@@ -3,9 +3,20 @@
 import { useAccount } from "../AccountDataProvider";
 import { updateUserProfile } from "@/lib/actions/user";
 import { useState } from "react";
-import { AlertCircle, CheckCircle, User, Mail, Building2, FileText, Phone, ShieldCheck } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle,
+  User,
+  Mail,
+  Building2,
+  FileText,
+  Phone,
+  ShieldCheck,
+} from "lucide-react";
 import AccountLoader from "@/components/Loaders/AccountLoader";
-
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function ProfileView() {
   const { user, setUser, loading } = useAccount();
@@ -13,6 +24,7 @@ export default function ProfileView() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: user?.name || "",
     businessName: user?.enterpriseProfile?.businessName || "",
@@ -28,7 +40,19 @@ export default function ProfileView() {
   }
 
   const isEnterprise = user.role === "enterprise";
+  const isAdmin = user.role === "admin";
   const enterprise = user.enterpriseProfile || {};
+
+  const handleLogout = async () => {
+    try {
+      await axios.post("/api/auth/logout");
+      toast.success("Logged out successfully");
+      window.location.href = "/"
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Logout failed");
+    }
+  };
 
   const handleEditClick = () => {
     setFormData({
@@ -91,7 +115,9 @@ export default function ProfileView() {
           <CheckCircle size={20} className="text-green-600 flex-shrink-0" />
           <div>
             <p className="font-semibold text-green-800 text-sm">Success</p>
-            <p className="text-green-700 text-sm">Profile updated successfully</p>
+            <p className="text-green-700 text-sm">
+              Profile updated successfully
+            </p>
           </div>
         </div>
       )}
@@ -123,14 +149,35 @@ export default function ProfileView() {
               </p>
             </div>
           </div>
-          {!isEditing && (
+          <div className="flex gap-2">
+            {/* Admin Button */}
+            {isAdmin && (
+              <button
+                onClick={() => router.push("/admin")}
+                className="px-4 py-2 bg-gray-900 hover:bg-black text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                Admin Panel
+              </button>
+            )}
+
+            {/* Edit Button */}
+            {!isEditing && (
+              <button
+                onClick={handleEditClick}
+                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                Edit Profile
+              </button>
+            )}
+
+            {/* Logout Button */}
             <button
-              onClick={handleEditClick}
-              className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors"
+              onClick={handleLogout}
+              className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors"
             >
-              Edit Profile
+              Logout
             </button>
-          )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -286,7 +333,7 @@ export default function ProfileView() {
 
             {/* Status */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
                 <ShieldCheck size={16} className="text-gray-500" />
                 Verification Status
               </label>
@@ -296,7 +343,9 @@ export default function ProfileView() {
                     className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border ${getStatusColor()}`}
                   >
                     {enterprise.status === "pending" && "⏳"}
-                    {enterprise.status === "verified" && <CheckCircle size={12} />}
+                    {enterprise.status === "verified" && (
+                      <CheckCircle size={12} />
+                    )}
                     {enterprise.status === "rejected" && "✗"}
                     <span className="ml-1">
                       {enterprise.status.charAt(0).toUpperCase() +
