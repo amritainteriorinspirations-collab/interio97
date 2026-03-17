@@ -1,176 +1,134 @@
-// components/customer/ProductCardGrid.js
-"use client"
-import Link from "next/link";
+// components/customer/ProductCardGrid.jsx
+"use client";
 
-export default function ProductCardGrid({ product, userRole }) {
-  const isEnterprise = userRole === "enterprise";
+import Link  from "next/link";
+import Image from "next/image";
 
-  // -----------------------------
-  // 🔥 SAME PRICE LOGIC AS PRODUCT PAGE
-  // -----------------------------
+// ── Price resolution ─────────────────────────────────────────────────────────
+// Returns { primaryPrice, primaryLabel, strikePrice, discountPct, savingsAmt }
+function resolvePrice(product, isEnterprise) {
+  const original   = isEnterprise ? product.enterprisePrice        : product.retailPrice;
+  const discounted = isEnterprise ? product.enterpriseDiscountPrice : product.retailDiscountPrice;
+  const perSqFt    = isEnterprise ? product.perSqFtPriceEnterprise  : product.perSqFtPriceRetail;
 
-  // Pick enterprise or retail values
-  const discounted = isEnterprise
-    ? product.enterpriseDiscountPrice
-    : product.retailDiscountPrice;
-
-  const original = isEnterprise ? product.enterprisePrice : product.retailPrice;
-
-  const perSqFt = isEnterprise
-    ? product.perSqFtPriceEnterprise
-    : product.perSqFtPriceRetail;
-
-  // Check if discount exists
   const hasDiscount = discounted && discounted < original;
+  const sellBy      = product.sellBy ?? "unit";
 
-  // Final structured values
-  let primaryPrice;
-  let secondaryPrice = null;
-
-  // CASE A — show price per SqFt
   if (product.showPerSqFtPrice) {
-    primaryPrice = perSqFt;
-
-    secondaryPrice = {
-      discounted: discounted || original,
-      original: hasDiscount ? original : null,
-      discountPercent: hasDiscount
-        ? Math.round(((original - discounted) / original) * 100)
-        : 0,
-      savings: hasDiscount ? original - discounted : 0,
+    return {
+      primaryPrice: perSqFt,
+      primaryLabel: "/ SqFt",
+      strikePrice:  hasDiscount ? original   : null,
+      salePrice:    hasDiscount ? discounted : original,
+      salePriceLabel: `/ ${sellBy}`,
+      discountPct:  hasDiscount ? Math.round(((original - discounted) / original) * 100) : 0,
+      savingsAmt:   hasDiscount ? original - discounted : 0,
     };
   }
 
-  // CASE B — normal price
-  else {
-    primaryPrice = discounted || original;
+  return {
+    primaryPrice: discounted || original,
+    primaryLabel: `/ ${sellBy}`,
+    strikePrice:  hasDiscount ? original : null,
+    salePrice:    null,
+    salePriceLabel: null,
+    discountPct:  hasDiscount ? Math.round(((original - discounted) / original) * 100) : 0,
+    savingsAmt:   hasDiscount ? original - discounted : 0,
+  };
+}
 
-    secondaryPrice = hasDiscount
-      ? {
-          original,
-          discountPercent: Math.round(
-            ((original - discounted) / original) * 100
-          ),
-          savings: original - discounted,
-        }
-      : null;
-  }
+const fmt = (n) => Number(n).toLocaleString("en-IN");
 
-  const sellBy = product.sellBy ?? "unit";
+// ─────────────────────────────────────────────────────────────────────────────
 
-  const mainImage =
-    product.images && product.images.length > 0 ? product.images[0] : null;
+export default function ProductCardGrid({ product, userRole }) {
+  const isEnterprise = userRole === "enterprise";
+  const price        = resolvePrice(product, isEnterprise);
+  const mainImage    = product.images?.[0] ?? null;
 
   return (
     <Link href={`/product/${product.slug}`} className="block min-w-44">
-      <article className="group bg-white rounded-md border border-gray-200 hover:shadow-sm 
-      transition-shadow duration-250 overflow-hidden flex flex-col">
-        {/* Image: wider aspect to make card shorter */}
+      <article className="group bg-white rounded-xl border border-gray-200 hover:border-orange-200 hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col">
+
+        {/* ── Image ── */}
         <div className="relative aspect-[4/3] bg-gray-50 overflow-hidden flex-shrink-0">
           {mainImage ? (
-            <img
+            <Image
               src={mainImage}
               alt={product.name}
-              className="
-                w-full h-full 
-                object-contain 
-                p-2 
-                group-hover:scale-[1.03] 
-                transition-transform duration-400
-              "
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 22vw"
+              className="object-contain p-2 group-hover:scale-[1.03] transition-transform duration-300"
               loading="lazy"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-              <span className="text-4xl">📦</span>
+              <span className="text-3xl">📦</span>
             </div>
+          )}
+
+          {/* Discount badge — top-right corner */}
+          {price.discountPct > 0 && (
+            <span className="absolute top-2 right-2 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+              {price.discountPct}% OFF
+            </span>
           )}
         </div>
 
-        {/* Info */}
-        <div className="px-3 py-2 flex flex-col flex-grow ">
+        {/* ── Info ── */}
+        <div className="px-3 py-2.5 flex flex-col flex-grow gap-1">
+
           {/* Brand */}
           {product.brand && (
-            <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wide truncate mb-1">
+            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider truncate">
               {product.brand}
             </p>
           )}
 
-          {/* Title — 2 lines max */}
-          <h3 className="text-[12px] font-medium text-gray-900 line-clamp-2 leading-snug mb-2">
+          {/* Name */}
+          <h3 className="text-xs font-medium text-gray-900 line-clamp-2 leading-snug">
             {product.name}
           </h3>
 
-          {/* PRICE BLOCK */}
-          <div className="mt-auto">
-            {/* TOP ROW — Primary left, Discounted + Original right */}
-            <div className="flex justify-between items-start gap-2">
-              {/* LEFT SIDE */}
-              <div className="flex flex-col leading-tight">
-                {/* PRIMARY PRICE */}
-                <span className="text-[13px] font-semibold text-gray-900">
-                  ₹{Number(primaryPrice).toLocaleString("en-IN")}
-                  {product.showPerSqFtPrice ? (
-                    <span className="text-[10px] text-gray-500"> / SqFt</span>
-                  ) : (
-                    <span className="text-[10px] text-gray-500">
-                      {" "}
-                      / {sellBy}
-                    </span>
-                  )}
+          {/* ── Price block ── */}
+          <div className="mt-auto pt-1 space-y-0.5">
+
+            {/* Primary price row */}
+            <div className="flex items-baseline gap-1.5 flex-wrap">
+              <span className="text-sm font-semibold text-gray-900">
+                ₹{fmt(price.primaryPrice)}
+                <span className="text-[10px] font-normal text-gray-500 ml-0.5">{price.primaryLabel}</span>
+              </span>
+
+              {/* Strike-through original (perSqFt mode: show sale price alongside) */}
+              {price.salePrice && (
+                <span className="text-xs text-gray-700 font-medium">
+                  ₹{fmt(price.salePrice)}
+                  <span className="text-[10px] font-normal text-gray-500 ml-0.5">{price.salePriceLabel}</span>
                 </span>
+              )}
 
-                {/* SAVINGS */}
-                {secondaryPrice?.savings > 0 && (
-                  <span className="text-[10px] px-2 py-1 bg-green-200 text-green-700 font-semibold rounded-xs mt-0.5">
-                    Save ₹
-                    {Number(secondaryPrice.savings).toLocaleString("en-IN")}
-                  </span>
-                )}
-              </div>
-
-              {/* RIGHT SIDE */}
-              <div className="flex flex-col items-end leading-tight">
-                {/* Discounted (only in perSqFt mode) */}
-                {product.showPerSqFtPrice && (
-                  <span className="text-[12px] text-gray-900 font-medium">
-                    ₹{Number(secondaryPrice.discounted).toLocaleString("en-IN")}{" "}
-                    / {sellBy}
-                  </span>
-                )}
-
-                {/* Original Price */}
-                {secondaryPrice?.original && (
-                  <span className="text-[10px] text-gray-400 line-through">
-                    ₹{Number(secondaryPrice.original).toLocaleString("en-IN")}
-                    {!product.showPerSqFtPrice && ` / ${sellBy}`}
-                  </span>
-                )}
-              </div>
+              {price.strikePrice && (
+                <span className="text-[11px] text-gray-400 line-through">
+                  ₹{fmt(price.strikePrice)}
+                </span>
+              )}
             </div>
 
-            {/* DISCOUNT BADGE BELOW */}
-            {secondaryPrice?.discountPercent > 0 && (
-              <div className="mt-1 w-fit ml-auto bg-green-600 text-white rounded-sm px-2 py-[2px] text-[10px] font-semibold">
-                {secondaryPrice.discountPercent}% OFF
-              </div>
+            {/* Savings pill */}
+            {price.savingsAmt > 0 && (
+              <span className="inline-block text-[10px] font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                Save ₹{fmt(price.savingsAmt)}
+              </span>
             )}
 
-            {/* ENTERPRISE LABEL */}
+            {/* Enterprise label — rendered once */}
             {isEnterprise && (
-              <p className="text-[10px] text-orange-600 font-medium mt-1">
-                Enterprise Price
-              </p>
+              <p className="text-[10px] text-orange-500 font-medium">Enterprise Price</p>
             )}
           </div>
-
-          {/* Enterprise tag (if any) */}
-          {isEnterprise && (
-            <p className="text-[11px] text-orange-600 font-medium mt-2">
-              Enterprise Price
-            </p>
-          )}
         </div>
+
       </article>
     </Link>
   );

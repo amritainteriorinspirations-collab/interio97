@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ShoppingCart, Minus, Plus, Check, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { addToCart, updateCartItem, removeFromCart } from "@/lib/actions/cart";
 
 export default function CartButton({ productId, stock }) {
@@ -16,20 +17,36 @@ export default function CartButton({ productId, stock }) {
   // ── On mount: check if already in cart ──────────────────────────────────
   useEffect(() => {
     let cancelled = false;
+
     async function checkCart() {
       try {
         const res = await fetch("/api/cart");
-        if (!res.ok || res.status === 401) { if (!cancelled) setState("idle"); return; }
+
+        // 401 → not logged in → show idle (not an error)
+        if (res.status === 401) {
+          if (!cancelled) setState("idle");
+          return;
+        }
+
+        if (!res.ok) {
+          if (!cancelled) setState("idle");
+          return;
+        }
+
         const { cart } = await res.json();
         const existing = cart?.items?.find(
           (i) => i.product?._id?.toString() === productId?.toString()
         );
+
         if (!cancelled) {
           if (existing) { setQty(existing.quantity); setState("stepper"); }
           else setState("idle");
         }
-      } catch { if (!cancelled) setState("idle"); }
+      } catch {
+        if (!cancelled) setState("idle");
+      }
     }
+
     checkCart();
     return () => { cancelled = true; };
   }, [productId]);
@@ -39,50 +56,92 @@ export default function CartButton({ productId, stock }) {
     setTimeout(() => setQtyBump(false), 300);
   }, []);
 
+  // ── Add to cart ──────────────────────────────────────────────────────────
   async function handleAdd() {
     if (state !== "idle") return;
     setState("adding");
+
     try {
       await addToCart(productId, 1);
       setState("added");
       setQty(1);
       setTimeout(() => setState("stepper"), 900);
     } catch (err) {
-      alert(err.message || "Failed to add to cart");
+      const msg = err.message || "Failed to add to cart";
+
+      // Detect auth errors and show a friendly toast with a login action
+      const isAuthError =
+        msg.toLowerCase().includes("not authenticated") ||
+        msg.toLowerCase().includes("unauthorized") ||
+        msg.toLowerCase().includes("login") ||
+        msg.toLowerCase().includes("sign in");
+
+      if (isAuthError) {
+        toast.error("Please log in to add items to your cart", {
+          description: "You need an account to save items.",
+          action: {
+            label: "Log in",
+            onClick: () => router.push("/login"),
+          },
+          duration: 5000,
+        });
+      } else {
+        toast.error(msg);
+      }
+
       setState("idle");
     }
   }
 
+  // ── Increment ────────────────────────────────────────────────────────────
   async function handleIncrement() {
     if (state === "updating" || qty >= stock) return;
     const next = qty + 1;
     setState("updating");
     setQty(next);
     triggerBump();
-    try { await updateCartItem(productId, next); }
-    catch (err) { setQty(qty); alert(err.message || "Failed to update cart"); }
-    finally { setState("stepper"); }
+    try {
+      await updateCartItem(productId, next);
+    } catch (err) {
+      setQty(qty);
+      toast.error(err.message || "Failed to update cart");
+    } finally {
+      setState("stepper");
+    }
   }
 
+  // ── Decrement / remove ───────────────────────────────────────────────────
   async function handleDecrement() {
     if (state === "updating") return;
     setState("updating");
+
     if (qty <= 1) {
-      try { await removeFromCart(productId); setQty(0); setState("idle"); }
-      catch (err) { alert(err.message || "Failed to remove from cart"); setState("stepper"); }
+      try {
+        await removeFromCart(productId);
+        setQty(0);
+        setState("idle");
+      } catch (err) {
+        toast.error(err.message || "Failed to remove from cart");
+        setState("stepper");
+      }
     } else {
       const next = qty - 1;
       setQty(next);
       triggerBump();
-      try { await updateCartItem(productId, next); }
-      catch (err) { setQty(qty); alert(err.message || "Failed to update cart"); }
-      finally { setState("stepper"); }
+      try {
+        await updateCartItem(productId, next);
+      } catch (err) {
+        setQty(qty);
+        toast.error(err.message || "Failed to update cart");
+      } finally {
+        setState("stepper");
+      }
     }
   }
 
-  // ── Checking skeleton (no layout shift) ─────────────────────────────────
+  // ── Checking skeleton ────────────────────────────────────────────────────
   if (state === "checking") {
-    return <div className="w-full h-[42px] bg-gray-100 rounded-sm animate-pulse" />;
+    return <div className="w-full h-[42px] bg-gray-100 rounded-lg animate-pulse" />;
   }
 
   // ── Add / Adding / Added ─────────────────────────────────────────────────
@@ -93,7 +152,7 @@ export default function CartButton({ productId, stock }) {
         disabled={state !== "idle"}
         className={`
           w-full flex items-center justify-center gap-2
-          px-3 py-2.5 rounded-sm font-semibold text-sm
+          px-3 py-2.5 rounded-lg font-semibold text-sm
           transition-all duration-300
           ${state === "added"
             ? "bg-green-600 text-white scale-[0.98]"
@@ -113,12 +172,12 @@ export default function CartButton({ productId, stock }) {
     );
   }
 
-  // ── Stepper (true 50 / 50 via grid-cols-2) ───────────────────────────────
+  // ── Stepper (50/50 grid) ─────────────────────────────────────────────────
   return (
     <div className="grid grid-cols-2 gap-2 w-full">
 
-      {/* LEFT 50%: Qty Stepper */}
-      <div className="flex items-center border-2 border-orange-500 rounded-sm overflow-hidden">
+      {/* LEFT — qty stepper */}
+      <div className="flex items-center border-2 border-orange-500 rounded-lg overflow-hidden">
         <button
           onClick={handleDecrement}
           disabled={state === "updating"}
@@ -155,12 +214,12 @@ export default function CartButton({ productId, stock }) {
         </button>
       </div>
 
-      {/* RIGHT 50%: View Cart */}
+      {/* RIGHT — view cart */}
       <button
         onClick={() => router.push("/account?tab=cart")}
         className="flex items-center justify-center gap-1.5
                    bg-gray-900 hover:bg-gray-700 active:scale-[0.98]
-                   text-white text-xs font-semibold rounded-sm
+                   text-white text-xs font-semibold rounded-lg
                    transition-all duration-150 whitespace-nowrap h-[42px]"
       >
         <ShoppingCart size={13} />

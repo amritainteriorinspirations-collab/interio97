@@ -1,91 +1,101 @@
 // components/HomePage/ProductByApplicationSection.jsx
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import ProductCard from "@/components/customer/ProductCardGrid";
+import { useState }       from "react";
+import Link               from "next/link";
+import Image              from "next/image";
 import { ArrowRightCircle } from "lucide-react";
 
-export default function ProductByApplicationSection({ applications, map }) {
-  const apps = applications.slice(0, 6); // limit to first 6
-  const [selected, setSelected] = useState(apps?.[0]?._id || null);
+import Section            from "@/components/ui/Section";
+import SectionHeading     from "@/components/ui/SectionHeading";
+import ProductCardGrid    from "@/components/customer/ProductCardGrid";
 
-  const products = selected ? map[selected] || [] : [];
+const MAX_APPS     = 6;
+const MAX_PRODUCTS = 5; // +1 "Explore All" card fills the 6th slot
+
+export default function ProductByApplicationSection({ applications, map }) {
+  const apps = applications.slice(0, MAX_APPS);
+  const [selectedId, setSelectedId] = useState(apps?.[0]?._id ?? null);
+
+  const products     = selectedId ? (map[selectedId] ?? []) : [];
+  const selectedApp  = apps.find((a) => a._id === selectedId);
+
+  if (!apps.length) return null;
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      {/* ---------------- Header ---------------- */}
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          Products by <span className="text-orange-600">Application</span>
-        </h2>
-        <p className="text-gray-600 text-sm">
-          Choose where you want to use the product
-        </p>
-      </div>
+    <Section>
+      <SectionHeading
+        title="Products by"
+        accent="Application"
+        subtitle="Choose where you want to use the product"
+      />
 
-      {/* ---------------- Application Selector ---------------- */}
-      <div className="flex justify-center flex-wrap gap-6 mb-14">
+      {/* ── Application tab selector ── */}
+      <div className="flex justify-center flex-wrap gap-4 sm:gap-6 mb-10">
         {apps.map((app) => {
-          const isActive = selected === app._id;
+          const isActive = selectedId === app._id;
           return (
             <button
               key={app._id}
-              onClick={() => setSelected(app._id)}
-              className={`
-                flex flex-col items-center text-center transition-all
-                ${isActive ? "scale-105" : "opacity-80 hover:opacity-100"}
-              `}
+              onClick={() => setSelectedId(app._id)}
+              className={`flex flex-col items-center gap-1.5 transition-all ${
+                isActive ? "scale-105" : "opacity-70 hover:opacity-100"
+              }`}
             >
-              {/* Circle */}
+              {/* Icon tile */}
               <div
-                className={`
-                  w-20 h-20 rounded-lg overflow-hidden flex items-center justify-center mb-2
-                  border-2 transition-all
-                  ${
-                    isActive
-                      ? "border-orange-500 ring-4 ring-orange-200 shadow-md"
-                      : "border-gray-200 hover:border-gray-300"
-                  }
-                `}
+                className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all ${
+                  isActive
+                    ? "border-orange-500 ring-4 ring-orange-100 shadow-md"
+                    : "border-gray-200 hover:border-orange-300"
+                }`}
               >
                 <Image
                   src={app.image}
                   alt={app.name}
                   width={80}
                   height={80}
-                  className="object-contain p-2.5"
+                  className="w-full h-full object-contain p-2"
                 />
               </div>
-
-              <p className="text-sm font-medium text-gray-700">{app.name}</p>
+              <span
+                className={`text-xs font-medium transition-colors ${
+                  isActive ? "text-orange-600" : "text-gray-600"
+                }`}
+              >
+                {app.name}
+              </span>
             </button>
           );
         })}
       </div>
 
-      {/* ---------------- Products Showcase ---------------- */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
-        {/* Product Cards */}
-        {products.slice(0, 5).map((product) => (
-          <ProductCard key={product._id} product={product} />
-        ))}
+      {/* ── Product grid ── */}
+      {products.length === 0 ? (
+        <div className="text-center py-12 text-sm text-gray-400">
+          No products found for this application.
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+          {products.slice(0, MAX_PRODUCTS).map((product) => (
+            <ProductCardGrid key={product._id} product={product} />
+          ))}
 
-        {/* ---------------- Explore All Card ---------------- */}
-        <Link
-          href={`/applications/${apps.find((a) => a._id === selected)?.slug}`}
-          className="
-            border-2 border-dashed border-gray-300 rounded-xl
-            flex flex-col items-center justify-center p-6 text-center
-            hover:border-orange-500 hover:bg-orange-50/40 transition
-          "
-        >
-          <ArrowRightCircle className="w-10 h-10 text-orange-500 mb-3" />
-          <p className="font-semibold text-gray-800">Explore All</p>
-          <p className="text-xs text-gray-500 mt-1">View more products</p>
-        </Link>
-      </div>
-    </section>
+          {/* Explore All card */}
+          <Link
+            href={`/applications/${selectedApp?.slug ?? ""}`}
+            className="
+              border-2 border-dashed border-gray-200 rounded-xl
+              flex flex-col items-center justify-center p-5 text-center
+              hover:border-orange-400 hover:bg-orange-50/50 transition-all group
+            "
+          >
+            <ArrowRightCircle className="w-9 h-9 text-orange-400 group-hover:text-orange-500 mb-2 transition-colors" />
+            <p className="text-sm font-semibold text-gray-700">Explore All</p>
+            <p className="text-xs text-gray-400 mt-0.5">View more products</p>
+          </Link>
+        </div>
+      )}
+    </Section>
   );
 }

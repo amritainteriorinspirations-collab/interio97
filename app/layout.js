@@ -4,7 +4,7 @@ import "./globals.css";
 import ClientLayout from "@/components/ClientLayout";
 import { getUserProfile } from "@/lib/api/api";
 import { AuthProvider } from "./providers/AuthProvider";
-// import { Toaster } from "sonner";
+import { Toaster } from "sonner";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -25,6 +25,7 @@ export default async function RootLayout({ children }) {
         <AuthProvider>
         <ClientLayout user={user}>{children}</ClientLayout>
         </AuthProvider>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

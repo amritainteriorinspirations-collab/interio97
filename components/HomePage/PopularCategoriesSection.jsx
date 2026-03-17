@@ -1,52 +1,44 @@
 // components/HomePage/PopularCategoriesSection.jsx
-import CategoryCard from "@/components/customer/CategoryCard";
+import Image         from "next/image";
+import Link          from "next/link";
+import CategoryCard  from "@/components/customer/CategoryCard";
+import Section       from "@/components/ui/Section";
+import SectionHeading from "@/components/ui/SectionHeading";
 import { getAllCategories } from "@/lib/fetchers/serverCategories";
 
+const MAX_CATEGORIES = 12;
+
 export default async function PopularCategoriesSection() {
-  // Take only top 12 categories
   const categories = await getAllCategories();
-  const topCategories = categories.slice(0, 12);
+  const top = categories.slice(0, MAX_CATEGORIES);
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <Section>
+      <SectionHeading
+        title="Popular Categories from"
+        accent="Amrita Interior Design"
+        subtitle="Explore our most loved category selections"
+      />
 
-      {/* ---------- Section Heading ---------- */}
-      <div className="mb-12 text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          Popular Categories from <span className="text-orange-600">Amrita Interior Design</span>
-        </h2>
-        <p className="text-gray-600 text-sm">
-          Explore our most loved category selections
-        </p>
-      </div>
-
-      {/* ---------- Empty State ---------- */}
-      {topCategories.length === 0 ? (
-        <div className="text-center py-20">
-          <div className="text-6xl mb-4">📦</div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            No categories available
-          </h3>
-          <p className="text-gray-600">Check back soon for new products!</p>
-        </div>
+      {top.length === 0 ? (
+        <EmptyState />
       ) : (
-        /* ---------- Grid Layout ---------- */
-        <div
-          className="
-            grid 
-            grid-cols-3
-            sm:grid-cols-3
-            md:grid-cols-4
-            lg:grid-cols-5
-            xl:grid-cols-6
-            gap-6 sm:gap-8 lg:gap-10
-          "
-        >
-          {topCategories.map((category) => (
-            <CategoryCard key={category._id} category={category} />
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 sm:gap-5">
+          {top.map((cat) => (
+            <CategoryCard key={cat._id} category={cat} />
           ))}
         </div>
       )}
-    </section>
+    </Section>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="text-center py-16">
+      <span className="text-5xl mb-4 block">📦</span>
+      <h3 className="text-lg font-semibold text-gray-800 mb-1">No categories yet</h3>
+      <p className="text-sm text-gray-500">Check back soon for new products!</p>
+    </div>
   );
 }
