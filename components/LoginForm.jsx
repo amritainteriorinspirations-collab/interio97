@@ -59,11 +59,11 @@ export const LoginForm = () => {
       setMessage("Login successful! Redirecting...");
       setTimeout(() => {
         if (data.user.role === "admin") {
-          router.push("/account");
+          window.location.href = "/admin"; // Force reload to update client-side auth state
         } else if (data.user.role === "enterprise_active") {
-          router.push("/account");
+          window.location.href = "/account"; // Force reload to update client-side auth state
         } else {
-          router.push("/");
+          window.location.href = "/"; // Force reload to update client-side auth state
         }
       }, 1500);
     } catch (error) {
