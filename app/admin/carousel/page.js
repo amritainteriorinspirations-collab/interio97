@@ -2,6 +2,8 @@
 import { getInspiredCarousel } from "@/lib/fetchers/inspiredCarousel";
 import CarouselManager from "@/components/admin/CarouselManager";
 
+export const dynamic = "force-dynamic";
+
 export default async function CarouselAdminPage() {
   const data = await getInspiredCarousel();
   const slides = data?.slides || [];

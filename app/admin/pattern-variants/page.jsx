@@ -17,6 +17,8 @@ async function handleDelete(formData) {
   revalidatePath("/admin/pattern-variants");
 }
 
+export const dynamic = "force-dynamic";
+
 /* -------------------- PAGE COMPONENT -------------------- */
 export default async function PatternVariantsPage() {
   const variants = await getAllPatternVariantsServer();

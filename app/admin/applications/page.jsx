@@ -14,7 +14,7 @@ async function handleDelete(formData) {
 }
 
 
-export const revalidate = 600; // Revalidate every 10 minutes
+export const dynamic = "force-dynamic";
 
 /* -------------------- PAGE COMPONENT -------------------- */
 export default async function ApplicationsPage() {

@@ -17,6 +17,8 @@ async function handleDelete(formData) {
   revalidatePath("/admin/color-variants");
 }
 
+export const dynamic = "force-dynamic";
+
 /* -------------------- PAGE COMPONENT -------------------- */
 export default async function ColorVariantsPage() {
   const variants = await getAllColorVariantsServer();
