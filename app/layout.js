@@ -4,6 +4,7 @@ import "./globals.css";
 import ClientLayout from "@/components/ClientLayout";
 import { AuthProvider } from "./providers/AuthProvider";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
           <ClientLayout>{children}</ClientLayout>
           <Toaster richColors position="top-center" />
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
