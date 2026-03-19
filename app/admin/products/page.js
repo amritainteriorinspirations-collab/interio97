@@ -6,6 +6,8 @@ import ProductsTable from "@/components/admin/ProductsTable";
 import { Plus } from "lucide-react";
 import { getAllCategories } from "@/lib/fetchers/serverCategories";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProductsPage() {
   const products = await getAllProducts();
   const categories = await getAllCategories();
