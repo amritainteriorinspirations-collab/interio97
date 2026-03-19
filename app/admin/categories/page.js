@@ -3,6 +3,8 @@ import { getAllCategories } from "@/lib/fetchers/serverCategories";
 import CategoriesTable from "@/components/admin/CategoriesTable";
 import { Plus } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function CategoriesPage() {
   const categories = await getAllCategories();
 
