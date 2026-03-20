@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.interio97.in
+
+# Sitemaps
+Sitemap: https://www.interio97.in/sitemap.xml
