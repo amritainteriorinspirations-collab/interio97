@@ -6,13 +6,12 @@ import Link from "next/link";
 import { AuthButton, FormInput } from "./AuthUtils/AuthFunctions";
 import { toast } from "sonner";
 
-export const SignupForm = () => {
-  const router = useRouter();
+const ROLE_LINKS = [
+  { role: "user",       label: "User",       href: "/signup/user" },
+  { role: "enterprise", label: "Enterprise", href: "/signup/enterprise" },
+];
 
-  // 👇 Role state
-  const [role, setRole] = useState("user");
-
-  // 👇 Form state
+export const SignupForm = ({ defaultRole = "user" }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,14 +22,16 @@ export const SignupForm = () => {
     phone: "",
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors]     = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  // ✅ Validation
+  const isEnterprise = defaultRole === "enterprise";
+
   const validateForm = () => {
     const newErrors = {};
 
     if (!formData.name) newErrors.name = "Name is required";
+
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -47,22 +48,20 @@ export const SignupForm = () => {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    // 👇 Additional validation for enterprise
-    if (role === "enterprise") {
-      if (!formData.businessName)
-        newErrors.businessName = "Business name is required";
-      if (!formData.gstNumber) newErrors.gstNumber = "GST number is required";
-      if (!formData.phone) newErrors.phone = "Phone number is required";
-      else if (!/^[0-9]{10}$/.test(formData.phone))
+    if (isEnterprise) {
+      if (!formData.businessName) newErrors.businessName = "Business name is required";
+      if (!formData.gstNumber)    newErrors.gstNumber    = "GST number is required";
+      if (!formData.phone) {
+        newErrors.phone = "Phone number is required";
+      } else if (!/^[0-9]{10}$/.test(formData.phone)) {
         newErrors.phone = "Enter a valid 10-digit phone number";
+      }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Submit handler
-  // ✅ Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -73,11 +72,11 @@ export const SignupForm = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          role,
+          role: defaultRole,
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          ...(role === "enterprise" && {
+          ...(isEnterprise && {
             businessName: formData.businessName,
             gstNumber: formData.gstNumber,
             phone: formData.phone,
@@ -88,20 +87,15 @@ export const SignupForm = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Signup failed");
 
-      // ✅ Enterprise user → no login yet
-      if (role === "enterprise") {
+      if (isEnterprise) {
         toast.success("Account created. Awaiting admin approval.");
-
         window.location.href = `/login/notice?msg=${encodeURIComponent(
           "Your enterprise account has been created successfully. An admin needs to verify your account before you can access enterprise-level features.",
         )}`;
         return;
       }
 
-      // ✅ Normal user → auto login flow
       toast.success("Account created successfully");
-
-      // Force full reload to sync navbar/profile/etc
       window.location.href = "/";
     } catch (error) {
       setErrors({ submit: error.message });
@@ -110,115 +104,40 @@ export const SignupForm = () => {
     }
   };
 
+  const field = (key) => ({
+    value: formData[key],
+    onChange: (e) => setFormData({ ...formData, [key]: e.target.value }),
+    error: errors[key],
+  });
+
+  const currentLabel = ROLE_LINKS.find((r) => r.role === defaultRole)?.label;
+  const otherRoles   = ROLE_LINKS.filter((r) => r.role !== defaultRole);
+
   return (
     <div className="mx-auto my-12 w-full max-w-lg p-6 rounded-lg border border-gray-200 shadow-sm bg-white">
-      <h2 className="text-2xl font-bold text-center text-orange-600 mb-6">
+      <h2 className="text-2xl font-bold text-center text-orange-600 mb-1">
         Create an Account
       </h2>
+      <p className="text-center text-sm text-gray-500 mb-6">{currentLabel} Signup</p>
 
-      {/* ✅ Role Selector */}
-      <div className="flex justify-center mb-6">
-        <div className="flex w-full max-w-xs rounded-lg overflow-hidden border border-gray-300">
-          <button
-            type="button"
-            onClick={() => setRole("user")}
-            className={`flex-1 py-2 text-center font-medium ${
-              role === "user"
-                ? "bg-orange-600 text-white"
-                : "bg-gray-100 text-gray-700"
-            }`}
-          >
-            User
-          </button>
-          <button
-            type="button"
-            onClick={() => setRole("enterprise")}
-            className={`flex-1 py-2 text-center font-medium ${
-              role === "enterprise"
-                ? "bg-orange-600 text-white"
-                : "bg-gray-100 text-gray-700"
-            }`}
-          >
-            Enterprise
-          </button>
-        </div>
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className={`flex gap-6 ${isEnterprise ? "flex-row" : "flex-col"}`}>
 
-      <form onSubmit={handleSubmit} className="space-y-4 ">
-        <div className="flex space-x-6">
+          {/* Common fields */}
           <div className="w-full space-y-3">
-            {/* Common fields */}
-            <FormInput
-              label="Name"
-              type="text"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              error={errors.name}
-            />
-            <FormInput
-              label="Email"
-              type="email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              error={errors.email}
-            />
-            <FormInput
-              label="Password"
-              type="password"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              error={errors.password}
-            />
-            <FormInput
-              label="Confirm Password"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={(e) =>
-                setFormData({ ...formData, confirmPassword: e.target.value })
-              }
-              error={errors.confirmPassword}
-            />
-            <p className="text-xs text-gray-500">
-              Password must be at least 8 characters.
-            </p>
+            <FormInput label="Name"             type="text"     {...field("name")} />
+            <FormInput label="Email"            type="email"    {...field("email")} />
+            <FormInput label="Password"         type="password" {...field("password")} />
+            <FormInput label="Confirm Password" type="password" {...field("confirmPassword")} />
+            <p className="text-xs text-gray-500">Password must be at least 8 characters.</p>
           </div>
 
-          {/* 👇 Conditional Enterprise fields */}
-          {role === "enterprise" && (
+          {/* Enterprise-only fields */}
+          {isEnterprise && (
             <div className="w-full space-y-3">
-              <FormInput
-                label="Business Name"
-                type="text"
-                value={formData.businessName}
-                onChange={(e) =>
-                  setFormData({ ...formData, businessName: e.target.value })
-                }
-                error={errors.businessName}
-              />
-              <FormInput
-                label="GST Number"
-                type="text"
-                value={formData.gstNumber}
-                onChange={(e) =>
-                  setFormData({ ...formData, gstNumber: e.target.value })
-                }
-                error={errors.gstNumber}
-              />
-              <FormInput
-                label="Phone Number"
-                type="text"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-                error={errors.phone}
-              />
+              <FormInput label="Business Name" type="text" {...field("businessName")} />
+              <FormInput label="GST Number"    type="text" {...field("gstNumber")} />
+              <FormInput label="Phone Number"  type="text" {...field("phone")} />
             </div>
           )}
         </div>
@@ -231,12 +150,20 @@ export const SignupForm = () => {
 
         <AuthButton isLoading={isLoading}>Sign Up</AuthButton>
 
-        <p className=" text-sm text-center text-gray-600 mt-3">
+        <p className="text-sm text-center text-gray-600 mt-3">
           Already have an account?{" "}
-          <Link href="/login" className="text-orange-600 hover:underline">
-            Log in
-          </Link>
+          <Link href="/login" className="text-orange-600 hover:underline">Log in</Link>
         </p>
+
+        {/* Other role links */}
+        <div className="flex justify-center items-center gap-3 pt-3 border-t border-gray-100">
+          <span className="text-xs text-gray-400">Sign up as:</span>
+          {otherRoles.map(({ role, label, href }) => (
+            <Link key={role} href={href} className="text-xs text-orange-600 hover:underline">
+              {label}
+            </Link>
+          ))}
+        </div>
       </form>
     </div>
   );
